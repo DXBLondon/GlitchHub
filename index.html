@@ -7,10 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap');
         
         * {
             font-family: 'Outfit', sans-serif;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        .font-display {
+            font-family: 'Orbitron', sans-serif;
         }
         
         html {
@@ -18,565 +24,309 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0f0f1e 0%, #1a0033 25%, #0a0033 50%, #0f0f1e 75%, #000000 100%);
+            background: radial-gradient(circle at 50% 50%, #120124 0%, #050014 100%);
             background-attachment: fixed;
             overflow-x: hidden;
+        }
+        
+        /* Neon Scanline Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.6;
         }
         
         /* Glitch Effect */
         .glitch {
             position: relative;
-            color: #00ff00;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-            animation: glitch-animation 0.15s infinite;
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+            animation: glitch-animation 3s infinite linear alternate-reverse;
         }
         
         @keyframes glitch-animation {
-            0% {
-                text-shadow: 
-                    0 0 10px rgba(0, 255, 0, 0.8),
-                    2px 2px 0px rgba(255, 0, 0, 0.8),
-                    -2px -2px 0px rgba(0, 0, 255, 0.8);
-                transform: translate(0);
-            }
-            20% {
-                text-shadow: 
-                    0 0 10px rgba(0, 255, 0, 0.8),
-                    2px 2px 0px rgba(255, 0, 0, 0.8),
-                    -2px -2px 0px rgba(0, 0, 255, 0.8);
-                transform: translate(-2px, 2px);
-            }
-            40% {
-                text-shadow: 
-                    0 0 10px rgba(0, 255, 0, 0.8),
-                    2px 2px 0px rgba(255, 0, 0, 0.8),
-                    -2px -2px 0px rgba(0, 0, 255, 0.8);
-                transform: translate(-2px, -2px);
-            }
-            60% {
-                text-shadow: 
-                    0 0 10px rgba(0, 255, 0, 0.8),
-                    2px 2px 0px rgba(255, 0, 0, 0.8),
-                    -2px -2px 0px rgba(0, 0, 255, 0.8);
-                transform: translate(2px, 2px);
-            }
-            80% {
-                text-shadow: 
-                    0 0 10px rgba(0, 255, 0, 0.8),
-                    2px 2px 0px rgba(255, 0, 0, 0.8),
-                    -2px -2px 0px rgba(0, 0, 255, 0.8);
-                transform: translate(2px, -2px);
-            }
-            100% {
-                text-shadow: 
-                    0 0 10px rgba(0, 255, 0, 0.8),
-                    2px 2px 0px rgba(255, 0, 0, 0.8),
-                    -2px -2px 0px rgba(0, 0, 255, 0.8);
-                transform: translate(0);
-            }
+            0% { text-shadow: 2px -1px 0 #ff0055, -2px 1px 0 #00ffcc; }
+            10% { text-shadow: -1px 2px 0 #ff0055, 2px -2px 0 #00ffcc; }
+            20% { text-shadow: 2px 2px 0 #ff0055, -1px -1px 0 #00ffcc; }
+            30% { text-shadow: -2px -2px 0 #ff0055, 1px 2px 0 #00ffcc; }
+            40% { text-shadow: 1px -1px 0 #ff0055, -2px -1px 0 #00ffcc; }
+            100% { text-shadow: 1px 1px 0 #ff0055, -1px -1px 0 #00ffcc; }
         }
 
-        /* Animated gradient blob */
         .blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.6;
+            filter: blur(80px);
+            opacity: 0.25;
             mix-blend-mode: screen;
+            pointer-events: none;
         }
 
         .blob-1 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(0, 255, 0, 0.3) 0%, transparent 70%);
-            top: 10%;
-            right: 10%;
-            animation: blob-move-1 8s ease-in-out infinite;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #00ffcc 0%, transparent 70%);
+            top: -10%; right: 10%; animation: blob-move 12s ease-in-out infinite;
         }
 
         .blob-2 {
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(138, 43, 226, 0.2) 0%, transparent 70%);
-            bottom: 20%;
-            left: 5%;
-            animation: blob-move-2 10s ease-in-out infinite;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #ff0055 0%, transparent 70%);
+            bottom: 10%; left: 5%; animation: blob-move 15s ease-in-out infinite alternate;
         }
 
-        .blob-3 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(0, 150, 255, 0.2) 0%, transparent 70%);
-            bottom: 10%;
-            right: 5%;
-            animation: blob-move-3 12s ease-in-out infinite;
+        @keyframes blob-move {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, -40px) scale(1.15); }
+            100% { transform: translate(0, 0) scale(1); }
         }
 
-        @keyframes blob-move-1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-30px, 50px) scale(0.9); }
-        }
-
-        @keyframes blob-move-2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-50px, 50px) scale(0.9); }
-            66% { transform: translate(50px, -30px) scale(1.1); }
-        }
-
-        @keyframes blob-move-3 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, 50px) scale(1.05); }
-            66% { transform: translate(-50px, -30px) scale(0.95); }
-        }
-
-        /* CTA Button */
         .cta-button {
-            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-            color: #000;
-            font-weight: 700;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.4);
-            transition: left 0.4s ease;
-        }
-
-        .cta-button:hover::before {
-            left: 100%;
+            background: linear-gradient(135deg, #00ffcc 0%, #0099ff 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .cta-button:hover {
-            transform: scale(1.08) translateY(-2px);
-            box-shadow: 0 0 40px rgba(0, 255, 0, 0.6), 0 15px 35px rgba(0, 255, 0, 0.3);
-            letter-spacing: 0.5px;
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.8);
         }
 
-        .cta-button:active {
-            transform: scale(0.98);
-        }
-
-        /* Pulse Text */
-        .pulse-text {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
-            50% { opacity: 0.6; text-shadow: 0 0 20px rgba(0, 255, 0, 0.8); }
-        }
-
-        /* Fade In Up */
-        @keyframes fade-in-up {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in-up {
-            animation: fade-in-up 0.8s ease-out forwards;
-        }
-
-        /* Game Card */
+        /* Cyberpunk UI Cards */
         .game-card {
-            background: rgba(0, 255, 0, 0.03);
-            border: 1.5px solid rgba(0, 255, 0, 0.2);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.15), inset 0 0 20px rgba(0, 255, 0, 0.02);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .game-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .game-card:hover::before {
-            left: 100%;
+            background: rgba(10, 5, 25, 0.7);
+            border: 1px solid rgba(0, 255, 204, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            backdrop-filter: blur(10px);
         }
 
         .game-card:hover {
-            background: rgba(0, 255, 0, 0.08);
-            border-color: rgba(0, 255, 0, 0.5);
-            box-shadow: 0 0 40px rgba(0, 255, 0, 0.3), inset 0 0 30px rgba(0, 255, 0, 0.05);
-            transform: translateY(-15px) scale(1.05);
+            border-color: #00ffcc;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+            transform: translateY(-10px);
         }
 
         .game-icon {
-            font-size: 4rem;
-            color: #00ff00;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            transition: all 0.4s ease;
+            background: linear-gradient(135deg, #00ffcc, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(0,255,204,0.5));
         }
 
-        .game-card:hover .game-icon {
-            transform: scale(1.2) rotate(10deg);
-            text-shadow: 0 0 40px rgba(0, 255, 0, 0.6);
-        }
-
-        /* Secondary Button */
-        .secondary-button {
-            background: rgba(0, 255, 0, 0.08);
-            border: 2px solid rgba(0, 255, 0, 0.4);
-            color: #00ff00;
-            font-weight: 600;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-        }
-
-        .secondary-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(0, 255, 0, 0.15);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .secondary-button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .secondary-button:hover {
-            border-color: rgba(0, 255, 0, 0.8);
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
-        }
-
-        /* Navigation */
         nav {
-            backdrop-filter: blur(12px);
-            background: rgba(0, 0, 0, 0.7);
-            border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+            backdrop-filter: blur(15px);
+            background: rgba(5, 2, 15, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        nav a {
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        nav a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background: #00ff00;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-        }
-
-        nav a:hover::after {
-            width: 100%;
-        }
-
-        /* Divider */
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
-        }
-
-        /* Hide sections */
-        .games-section,
-        .game-container {
+        .games-section, .game-container {
             display: none;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.4s ease;
         }
 
-        .games-section.active,
-        .game-container.active {
+        .games-section.active, .game-container.active {
             display: block;
             opacity: 1;
         }
 
-        /* Back button */
-        .back-button {
-            position: fixed;
-            top: 80px;
-            left: 30px;
-            z-index: 40;
-            display: none;
-            background: rgba(0, 255, 0, 0.1);
-            border: 2px solid rgba(0, 255, 0, 0.4);
-            color: #00ff00;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 255, 0, 0.2);
-            border-color: rgba(0, 255, 0, 0.8);
-        }
-
-        .back-button.show {
-            display: block;
-        }
-
-        /* Game Canvas */
         #gameCanvas {
-            display: block;
-            margin: 0 auto;
-            background: #000;
-            border: 2px solid rgba(0, 255, 0, 0.5);
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-        }
-
-        /* Game Score */
-        .game-score {
-            text-align: center;
-            font-size: 2rem;
-            color: #00ff00;
-            margin: 20px 0;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-            font-weight: bold;
-        }
-
-        .game-controls {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .game-controls button {
-            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-            color: #000;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: bold;
+            background: #04010a;
+            border: 2px solid #00ffcc;
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.15);
             cursor: pointer;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-
-        .game-controls button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-        }
-
-        .game-info {
-            color: #00ff00;
-            text-align: center;
-            margin: 15px 0;
-            font-size: 1.1rem;
         }
     </style>
 </head>
-<body class="text-white overflow-x-hidden">
+<body class="text-white min-h-screen relative">
+    <div class="scanlines"></div>
+
     <!-- Navigation -->
     <nav class="fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-black glitch" style="animation: none; letter-spacing: 2px;" onclick="goHome()" style="cursor: pointer;">
-                <i class="fas fa-bolt"></i> GLITCH
+            <div class="text-2xl font-black font-display tracking-wider glitch cursor-pointer" onclick="goHome()">
+                <i class="fas fa-terminal text-xl mr-2"></i>GLITCH<span class="text-pink-500">HUB</span>
             </div>
-            <div class="hidden md:flex gap-8 items-center">
-                <a href="#" onclick="goHome()" class="text-sm font-medium uppercase tracking-wider hover:text-green-400">Home</a>
+            <div class="flex gap-6 items-center">
+                <a href="#" onclick="goHome()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition">Mainframe</a>
             </div>
         </div>
     </nav>
 
-    <!-- Back Button -->
-    <button class="back-button md:hidden text-green-400 text-xl" id="backBtn" onclick="goHome()">
-        <i class="fas fa-arrow-left"></i> Back
-    </button>
-
-    <!-- Hero Section (Home) -->
-    <section id="home-section" class="min-h-screen flex items-center justify-center relative pt-20 overflow-hidden">
-        <!-- Animated Blobs -->
+    <!-- Home Base Platform -->
+    <section id="home-section" class="min-h-screen flex items-center justify-center relative pt-20">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
         
-        <div class="relative z-10 text-center px-6 max-w-5xl fade-in-up">
-            <h1 class="text-7xl md:text-8xl font-black mb-6 leading-tight">
-                Welcome to<br>
-                <span class="glitch">GLITCH</span>
+        <div class="relative z-10 text-center px-6 max-w-4xl">
+            <h1 class="text-6xl md:text-8xl font-black mb-6 font-display tracking-tight uppercase">
+                Arcade Room<br>
+                <span class="glitch text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Initialized</span>
             </h1>
-
-            <p class="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
-                Explore a world of free games and entertainment. No paywalls, no ads, just pure fun.
+            <p class="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                Zero installations. Pure HTML5 interactive game matrices engineered with optimized game loop updates, enhanced graphics, and precise tracking mechanics.
             </p>
-            
-            <button class="cta-button px-12 py-5 rounded-lg text-2xl uppercase font-bold tracking-wider" onclick="enterGames()">
-                <i class="fas fa-rocket mr-3"></i> Launch
+            <button class="cta-button px-10 py-4 rounded-xl text-lg font-display uppercase font-black tracking-widest text-black" onclick="enterGames()">
+                <i class="fas fa-play mr-2"></i> Access Games
             </button>
-
-            <!-- Scroll Indicator -->
-            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 pulse-text">
-                <i class="fas fa-chevron-down text-3xl text-green-400"></i>
-            </div>
         </div>
     </section>
 
-    <!-- Games Section -->
+    <!-- Grid Layout of Game Items -->
     <section id="games-section" class="games-section min-h-screen py-32 px-6">
         <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-20">
-                <h2 class="text-6xl md:text-7xl font-black mb-6">
-                    Choose Your <span class="text-green-400">Game</span>
-                </h2>
-                <div class="divider my-8"></div>
-                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
-                    Pick from our collection of free games and start playing instantly
-                </p>
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black font-display mb-4">SELECT CORE MODULE</h2>
+                <p class="text-gray-400">Click a portal target below to compile and execute the dynamic canvas grid wrapper.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Game 1: Snake -->
-                <button onclick="startGame('snake')" class="game-card p-8 rounded-2xl text-center group hover:no-underline" style="text-decoration: none; background: rgba(0, 255, 0, 0.03); border: 1.5px solid rgba(0, 255, 0, 0.2);">
-                    <div class="game-icon">
-                        <i class="fas fa-snake"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card Elements -->
+                <div onclick="startGame('snake')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-scroll"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-cyan-400">NEON SNAKE</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Polished vector movement array with trailing graphics, dynamic physics acceleration speed curves, and precise grid layout collisions.</p>
                     </div>
-                    <h3 class="text-3xl font-bold mb-3">Snake</h3>
-                    <p class="text-gray-300 mb-6">The classic arcade game. Navigate and grow while avoiding walls.</p>
-                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
-                        Play Now
-                    </div>
-                </button>
+                    <div class="mt-6 font-display text-xs tracking-wider text-cyan-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
 
-                <!-- Game 2: Memory Match -->
-                <button onclick="startGame('memory')" class="game-card p-8 rounded-2xl text-center group hover:no-underline" style="text-decoration: none; background: rgba(0, 255, 0, 0.03); border: 1.5px solid rgba(0, 255, 0, 0.2);">
-                    <div class="game-icon">
-                        <i class="fas fa-chess"></i>
+                <div onclick="startGame('memory')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-brain"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-pink-400">MATRIX MATCH</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Fluid card flip transforms, item tracking indexes, visual particle splash bursts, and combo performance metrics.</p>
                     </div>
-                    <h3 class="text-3xl font-bold mb-3">Memory Match</h3>
-                    <p class="text-gray-300 mb-6">Test your memory by matching tiles. Challenge yourself to beat your record.</p>
-                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
-                        Play Now
-                    </div>
-                </button>
+                    <div class="mt-6 font-display text-xs tracking-wider text-pink-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
 
-                <!-- Game 3: Flappy Bird -->
-                <button onclick="startGame('flappy')" class="game-card p-8 rounded-2xl text-center group hover:no-underline" style="text-decoration: none; background: rgba(0, 255, 0, 0.03); border: 1.5px solid rgba(0, 255, 0, 0.2);">
-                    <div class="game-icon">
-                        <i class="fas fa-gamepad"></i>
+                <div onclick="startGame('flappy')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-dove"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-yellow-400">CYBER BIRD</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Real-time delta variable integration, precise particle collision box scaling, spatial vector angles, and background scrolling loops.</p>
                     </div>
-                    <h3 class="text-3xl font-bold mb-3">Flappy Bird</h3>
-                    <p class="text-gray-300 mb-6">Navigate through obstacles. One tap to fly, timing is everything.</p>
-                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
-                        Play Now
-                    </div>
-                </button>
+                    <div class="mt-6 font-display text-xs tracking-wider text-yellow-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
 
-                <!-- Game 4: Dice Game -->
-                <button onclick="startGame('dice')" class="game-card p-8 rounded-2xl text-center group hover:no-underline" style="text-decoration: none; background: rgba(0, 255, 0, 0.03); border: 1.5px solid rgba(0, 255, 0, 0.2);">
-                    <div class="game-icon">
-                        <i class="fas fa-dice"></i>
+                <div onclick="startGame('dice')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-dice-d20"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-purple-400">3D DICE 21</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Geometric projection algorithms calculating 3D rotation structures, automated weight distributions, and full strategic blackjack choices.</p>
                     </div>
-                    <h3 class="text-3xl font-bold mb-3">Dice Game</h3>
-                    <p class="text-gray-300 mb-6">Roll the dice and test your luck. Reach 21 without going over.</p>
-                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
-                        Play Now
-                    </div>
-                </button>
+                    <div class="mt-6 font-display text-xs tracking-wider text-purple-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
 
-                <!-- Game 5: Star Clicker -->
-                <button onclick="startGame('clicker')" class="game-card p-8 rounded-2xl text-center group hover:no-underline" style="text-decoration: none; background: rgba(0, 255, 0, 0.03); border: 1.5px solid rgba(0, 255, 0, 0.2);">
-                    <div class="game-icon">
-                        <i class="fas fa-star"></i>
+                <div onclick="startGame('clicker')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-bolt"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-green-400">QUANTUM CLICKER</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Dynamic element sizing arrays, high speed processing calculations, random special combo target spawns, and chain multipliers.</p>
                     </div>
-                    <h3 class="text-3xl font-bold mb-3">Star Clicker</h3>
-                    <p class="text-gray-300 mb-6">Click stars as fast as you can. How many can you collect in 30 seconds?</p>
-                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
-                        Play Now
-                    </div>
-                </button>
+                    <div class="mt-6 font-display text-xs tracking-wider text-green-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
 
-                <!-- Game 6: Pong -->
-                <button onclick="startGame('pong')" class="game-card p-8 rounded-2xl text-center group hover:no-underline" style="text-decoration: none; background: rgba(0, 255, 0, 0.03); border: 1.5px solid rgba(0, 255, 0, 0.2);">
-                    <div class="game-icon">
-                        <i class="fas fa-table-tennis"></i>
+                <div onclick="startGame('pong')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-table-tennis-paddle-ball"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-blue-400">PONG PROTOCOL</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Dynamic kinetic velocity angle curves based on contact location, elastic physics calculations, and humanized processing lag AI.</p>
                     </div>
-                    <h3 class="text-3xl font-bold mb-3">Pong</h3>
-                    <p class="text-gray-300 mb-6">Classic paddle game. Use arrow keys or mouse to move your paddle.</p>
-                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
-                        Play Now
-                    </div>
-                </button>
+                    <div class="mt-6 font-display text-xs tracking-wider text-blue-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Game Container -->
-    <section id="game-container" class="game-container min-h-screen py-20 px-6">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-8">
-                <h2 class="text-5xl font-black text-green-400 mb-4" id="gameTitle">Game</h2>
-                <div class="game-score" id="gameScore">Score: 0</div>
-                <div class="game-info" id="gameInfo"></div>
+    <!-- Screen System Content Wrapper Box -->
+    <section id="game-container" class="game-container min-h-screen py-24 px-4">
+        <div class="max-w-4xl mx-auto bg-slate-950/60 p-6 rounded-3xl border border-white/5 backdrop-blur-xl">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b border-white/10 pb-6">
+                <div>
+                    <h2 class="text-4xl font-black font-display text-cyan-400 tracking-wide uppercase" id="gameTitle">SYSTEM ENGINE</h2>
+                    <p id="gameInstructions" class="text-xs text-gray-400 mt-1"></p>
+                </div>
+                <div class="bg-black/50 px-6 py-2 rounded-xl border border-white/10 text-right">
+                    <span class="text-xs font-display text-gray-500 tracking-widest block uppercase">Telemetry Data</span>
+                    <div class="text-2xl font-black font-display tracking-wider text-green-400" id="gameScore">00000</div>
+                </div>
             </div>
 
-            <div class="text-center mb-8">
-                <canvas id="gameCanvas" width="800" height="400"></canvas>
+            <div class="relative overflow-hidden rounded-xl bg-black flex justify-center items-center">
+                <canvas id="gameCanvas" width="800" height="450" class="max-w-full h-auto"></canvas>
             </div>
 
-            <div class="game-controls">
-                <button id="startBtn" onclick="handleGameAction('start')">Start Game</button>
-                <button id="pauseBtn" onclick="handleGameAction('pause')" style="display: none;">Pause</button>
-                <button id="resumeBtn" onclick="handleGameAction('resume')" style="display: none;">Resume</button>
-                <button onclick="goHome()" class="secondary-button" style="background: rgba(255, 0, 0, 0.1); border-color: rgba(255, 0, 0, 0.4); color: #ff6b6b;">Back to Menu</button>
+            <div class="flex flex-wrap justify-center gap-4 mt-6">
+                <button id="startBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-black font-display tracking-widest px-8 py-3 rounded-xl transition text-sm uppercase shadow-lg shadow-emerald-950/50" onclick="triggerGameStart()">INITIALIZE</button>
+                <button id="actionBtn" class="bg-white/10 hover:bg-white/20 text-white font-black font-display tracking-widest px-6 py-3 rounded-xl transition text-sm uppercase hidden" onclick="triggerGameAction()"></button>
+                <button class="bg-rose-950/40 hover:bg-rose-900/50 text-rose-400 font-bold border border-rose-500/20 px-6 py-3 rounded-xl transition text-sm tracking-wide" onclick="goHome()">KILL PROCESS</button>
             </div>
-
-            <div id="gameInstructions" class="mt-8 text-gray-300 text-center"></div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="py-16 px-6 border-t border-green-500/20 bg-black/40">
-        <div class="max-w-6xl mx-auto text-center text-gray-400">
-            <p>&copy; 2026 GlitchHub. All rights reserved. Built with <span class="text-red-500 text-lg">❤</span> for gamers.</p>
-        </div>
+    <footer class="py-12 border-t border-white/5 bg-black/40 text-center text-sm text-gray-500 tracking-wider">
+        <p>&copy; 2026 GLITCHHUB CORE MAINFRAME ENGINE. DESIGN INTEGRITY SECURED.</p>
     </footer>
 
+    <!-- Execution Engine Scripts Injection -->
     <script>
         let currentGame = null;
-        let gameState = null;
         let animationId = null;
+        let canvas, ctx;
+        let keys = {};
 
-        // Navigation functions
+        // Screen Shake Framework
+        let shakeIntensity = 0;
+        function applyScreenShake(amt) { shakeIntensity = amt; }
+
+        // Particles Asset Object Array Pool
+        let particles = [];
+        function createExplosion(x, y, color, count=15) {
+            for(let i=0; i<count; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    radius: Math.random() * 3 + 1,
+                    alpha: 1,
+                    decay: Math.random() * 0.03 + 0.01,
+                    color: color
+                });
+            }
+        }
+
+        function updateAndRenderParticles() {
+            for(let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                p.alpha -= p.decay;
+                if(p.alpha <= 0) { particles.splice(i, 1); continue; }
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Global Listening Array Controls Setup
+        window.addEventListener('keydown', e => { 
+            keys[e.key] = true; 
+            if(["ArrowUp","ArrowDown","Space"," "].includes(e.key) && currentGame) e.preventDefault(); 
+        });
+        window.addEventListener('keyup', e => { keys[e.key] = false; });
+
         function enterGames() {
             document.getElementById('home-section').style.display = 'none';
             document.getElementById('games-section').classList.add('active');
-            document.getElementById('backBtn').classList.add('show');
-            window.scrollTo(0, 0);
         }
 
         function goHome() {
@@ -584,832 +334,931 @@
             document.getElementById('home-section').style.display = 'flex';
             document.getElementById('games-section').classList.remove('active');
             document.getElementById('game-container').classList.remove('active');
-            document.getElementById('backBtn').classList.remove('show');
             currentGame = null;
-            gameState = null;
-            window.scrollTo(0, 0);
         }
 
         function startGame(gameName) {
             document.getElementById('games-section').classList.remove('active');
             document.getElementById('game-container').classList.add('active');
             currentGame = gameName;
-            initializeGame(gameName);
-            window.scrollTo(0, 0);
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            particles = []; shakeIntensity = 0;
+            initializeGameModule(gameName);
         }
 
-        function handleGameAction(action) {
-            if (gameState) {
-                gameState.action = action;
+        // Render Structural Background Grid Vector
+        function drawVectorGrid() {
+            ctx.strokeStyle = "rgba(0, 255, 204, 0.03)";
+            ctx.lineWidth = 1;
+            let gridSize = 30;
+            for(let x=0; x<canvas.width; x+=gridSize) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+            for(let y=0; y<canvas.height; y+=gridSize) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+        }
+
+        // Context Matrix Transformation Calculations for Shake effects
+        function preRenderFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            if(shakeIntensity > 0) {
+                let dx = (Math.random() - 0.5) * shakeIntensity;
+                let dy = (Math.random() - 0.5) * shakeIntensity;
+                ctx.translate(dx, dy);
+                shakeIntensity *= 0.9;
+                if(shakeIntensity < 0.2) shakeIntensity = 0;
             }
+            drawVectorGrid();
         }
 
-        // Game Initialization
-        function initializeGame(gameName) {
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
+        function postRenderFrame() {
+            updateAndRenderParticles();
+            ctx.restore();
+        }
+
+        let gameInstance = null;
+        function initializeGameModule(name) {
             const startBtn = document.getElementById('startBtn');
-            const pauseBtn = document.getElementById('pauseBtn');
-            const resumeBtn = document.getElementById('resumeBtn');
+            const actionBtn = document.getElementById('actionBtn');
             const title = document.getElementById('gameTitle');
             const instructions = document.getElementById('gameInstructions');
-
-            // Clear previous animation
+            
             if (animationId) cancelAnimationFrame(animationId);
+            actionBtn.classList.add('hidden');
+            startBtn.classList.remove('hidden');
+            startBtn.textContent = "INITIALIZE INSTANCE";
+            document.getElementById('gameScore').textContent = "00000";
 
-            switch(gameName) {
+            canvas.onclick = null;
+
+            switch(name) {
                 case 'snake':
-                    title.textContent = 'Snake';
-                    instructions.innerHTML = 'Use arrow keys to move. Eat food to grow. Don\'t hit the walls!';
-                    initSnake(canvas, ctx, startBtn, pauseBtn, resumeBtn);
+                    title.textContent = "Neon Snake Array";
+                    instructions.textContent = "Directional Keys: Controls structural expansion trace vector grid. Objective: Consume data chips.";
+                    setupSnake();
                     break;
                 case 'memory':
-                    title.textContent = 'Memory Match';
-                    instructions.innerHTML = 'Click tiles to find matching pairs. Try to match all tiles!';
-                    initMemory(canvas, ctx, startBtn, pauseBtn, resumeBtn);
+                    title.textContent = "Matrix Match Matrix";
+                    instructions.textContent = "Input Target Pointer: Click tiles to decode duplicate encrypted memory nodes.";
+                    setupMemory();
                     break;
                 case 'flappy':
-                    title.textContent = 'Flappy Bird';
-                    instructions.innerHTML = 'Click or press SPACE to make the bird fly. Avoid the pipes!';
-                    initFlappy(canvas, ctx, startBtn, pauseBtn, resumeBtn);
+                    title.textContent = "Cyber Bird Vector";
+                    instructions.textContent = "Spacebar / Canvas Click: Discharges upward lift thrust delta variable to avoid firewalls.";
+                    setupFlappy();
                     break;
                 case 'dice':
-                    title.textContent = 'Dice Game';
-                    instructions.innerHTML = 'Roll the dice. Try to reach exactly 21 without going over!';
-                    initDice(canvas, ctx, startBtn, pauseBtn, resumeBtn);
+                    title.textContent = "3D Dice Protocol";
+                    instructions.textContent = "Process dynamic outcome metrics. Pull values closest to quantitative value 21.";
+                    setupDice();
                     break;
                 case 'clicker':
-                    title.textContent = 'Star Clicker';
-                    instructions.innerHTML = 'Click the stars as fast as you can! 30 seconds timer.';
-                    initClicker(canvas, ctx, startBtn, pauseBtn, resumeBtn);
+                    title.textContent = "Quantum Clicker Matrix";
+                    instructions.textContent = "Target click popping element modules. Maintain efficiency velocity ratios.";
+                    setupClicker();
                     break;
                 case 'pong':
-                    title.textContent = 'Pong';
-                    instructions.innerHTML = 'Use arrow keys (↑↓) to move your paddle. Win by scoring!';
-                    initPong(canvas, ctx, startBtn, pauseBtn, resumeBtn);
+                    title.textContent = "Pong Logic Protocol";
+                    instructions.textContent = "Controls: ArrowUp/ArrowDown to guide reflective pad against machine processor logic.";
+                    setupPong();
                     break;
             }
         }
 
-        // SNAKE GAME
-        function initSnake(canvas, ctx, startBtn, pauseBtn, resumeBtn) {
-            gameState = {
-                snake: [{x: 200, y: 200}],
-                food: {x: 300, y: 300},
-                direction: {x: 10, y: 0},
-                nextDirection: {x: 10, y: 0},
-                score: 0,
-                gameOver: false,
-                paused: false,
-                running: false,
-                action: null
-            };
+        function triggerGameStart() {
+            if(gameInstance && gameInstance.start) gameInstance.start();
+        }
+        function triggerGameAction() {
+            if(gameInstance && gameInstance.actionCallback) gameInstance.actionCallback();
+        }
 
-            startBtn.textContent = 'Start Game';
-            startBtn.style.display = 'block';
-            pauseBtn.style.display = 'none';
-            resumeBtn.style.display = 'none';
+        // ==========================================
+        // 1. NEON SNAKE SYSTEM UPGRADE ENGINE
+        // ==========================================
+        function setupSnake() {
+            let snake, food, dir, nextDir, score, isRunning, stepCounter, gameSpeed;
+            const grid = 15;
 
-            startBtn.onclick = function() {
-                if (!gameState.running) {
-                    gameState.running = true;
-                    gameState.gameOver = false;
-                    startBtn.style.display = 'none';
-                    pauseBtn.style.display = 'block';
-                    gameState.snake = [{x: 200, y: 200}];
-                    gameState.food = getRandomFood();
-                    gameState.score = 0;
-                    gameState.direction = {x: 10, y: 0};
-                    gameState.nextDirection = {x: 10, y: 0};
-                    playSnake(canvas, ctx, pauseBtn, resumeBtn, startBtn);
-                }
-            };
-
-            document.onkeydown = function(e) {
-                if (!gameState.running) return;
-                if (e.key === 'ArrowUp' && gameState.direction.y === 0) gameState.nextDirection = {x: 0, y: -10};
-                if (e.key === 'ArrowDown' && gameState.direction.y === 0) gameState.nextDirection = {x: 0, y: 10};
-                if (e.key === 'ArrowLeft' && gameState.direction.x === 0) gameState.nextDirection = {x: -10, y: 0};
-                if (e.key === 'ArrowRight' && gameState.direction.x === 0) gameState.nextDirection = {x: 10, y: 0};
-            };
-
-            function getRandomFood() {
-                return {
-                    x: Math.floor(Math.random() * 80) * 10,
-                    y: Math.floor(Math.random() * 40) * 10
+            function spawnFood() {
+                food = {
+                    x: Math.floor(Math.random() * (canvas.width / grid)) * grid,
+                    y: Math.floor(Math.random() * (canvas.height / grid)) * grid
                 };
             }
 
-            function playSnake(canvas, ctx, pauseBtn, resumeBtn, startBtn) {
-                if (gameState.action === 'pause') {
-                    gameState.paused = true;
-                    gameState.action = null;
-                    pauseBtn.style.display = 'none';
-                    resumeBtn.style.display = 'block';
-                    drawSnake(canvas, ctx);
-                    return;
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    snake = [{x: 120, y: 120}, {x: 105, y: 120}, {x: 90, y: 120}];
+                    dir = {x: grid, y: 0}; nextDir = {x: grid, y: 0};
+                    score = 0; isRunning = true; stepCounter = 0; gameSpeed = 5; 
+                    spawnFood();
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00000";
+                    loop();
                 }
-                if (gameState.action === 'resume') {
-                    gameState.paused = false;
-                    gameState.action = null;
-                    pauseBtn.style.display = 'block';
-                    resumeBtn.style.display = 'none';
+            };
+
+            function loop() {
+                if(!isRunning) return;
+                animationId = requestAnimationFrame(loop);
+                
+                if((keys['ArrowUp'] || keys['w']) && dir.y === 0) nextDir = {x: 0, y: -grid};
+                if((keys['ArrowDown'] || keys['s']) && dir.y === 0) nextDir = {x: 0, y: grid};
+                if((keys['ArrowLeft'] || keys['a']) && dir.x === 0) nextDir = {x: -grid, y: 0};
+                if((keys['ArrowRight'] || keys['d']) && dir.x === 0) nextDir = {x: grid, y: 0};
+
+                stepCounter++;
+                if(stepCounter < gameSpeed) {
+                    render();
+                    return; 
+                }
+                stepCounter = 0;
+
+                dir = nextDir;
+                let head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+                if(head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                    gameOver(); return;
+                }
+                for(let seg of snake) {
+                    if(head.x === seg.x && head.y === seg.y) { gameOver(); return; }
                 }
 
-                if (gameState.paused) {
-                    animationId = requestAnimationFrame(() => playSnake(canvas, ctx, pauseBtn, resumeBtn, startBtn));
-                    return;
-                }
+                snake.unshift(head);
 
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                gameState.direction = gameState.nextDirection;
-                let head = {x: gameState.snake[0].x + gameState.direction.x, y: gameState.snake[0].y + gameState.direction.y};
-
-                if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
-                    gameState.gameOver = true;
-                    gameState.running = false;
-                    pauseBtn.style.display = 'none';
-                    startBtn.style.display = 'block';
-                    startBtn.textContent = 'Game Over! Click to Restart';
-                    document.getElementById('gameScore').textContent = `Score: ${gameState.score} - Game Over!`;
-                    drawSnake(canvas, ctx);
-                    return;
-                }
-
-                if (head.x === gameState.food.x && head.y === gameState.food.y) {
-                    gameState.score += 10;
-                    gameState.food = getRandomFood();
+                if(head.x === food.x && head.y === food.y) {
+                    score += 100;
+                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                    applyScreenShake(8);
+                    createExplosion(food.x + grid/2, food.y + grid/2, '#00ffcc', 20);
+                    spawnFood();
+                    if(score % 300 === 0 && gameSpeed > 2) gameSpeed--; 
                 } else {
-                    gameState.snake.pop();
+                    snake.pop();
                 }
 
-                for (let segment of gameState.snake) {
-                    if (segment.x === head.x && segment.y === head.y) {
-                        gameState.gameOver = true;
-                        gameState.running = false;
-                        pauseBtn.style.display = 'none';
-                        startBtn.style.display = 'block';
-                        startBtn.textContent = 'Game Over! Click to Restart';
-                        document.getElementById('gameScore').textContent = `Score: ${gameState.score} - Game Over!`;
-                        drawSnake(canvas, ctx);
-                        return;
-                    }
-                }
-
-                gameState.snake.unshift(head);
-                drawSnake(canvas, ctx);
-                document.getElementById('gameScore').textContent = `Score: ${gameState.score}`;
-
-                animationId = requestAnimationFrame(() => playSnake(canvas, ctx, pauseBtn, resumeBtn, startBtn));
+                render();
             }
 
-            function drawSnake(canvas, ctx) {
-                // Draw food
-                ctx.fillStyle = '#ff6b6b';
-                ctx.fillRect(gameState.food.x, gameState.food.y, 10, 10);
-
-                // Draw snake
-                for (let i = 0; i < gameState.snake.length; i++) {
-                    ctx.fillStyle = i === 0 ? '#00ff00' : '#00cc00';
-                    ctx.fillRect(gameState.snake[i].x, gameState.snake[i].y, 10, 10);
-                    ctx.strokeStyle = '#00ff00';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(gameState.snake[i].x, gameState.snake[i].y, 10, 10);
-                }
+            function gameOver() {
+                isRunning = false;
+                applyScreenShake(25);
+                createExplosion(snake[0].x, snake[0].y, '#ff0055', 40);
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('startBtn').textContent = "REBOOT MATRIX MODULE";
             }
+
+            function render() {
+                preRenderFrame();
+
+                ctx.shadowBlur = 15; ctx.shadowColor = "#ff0055";
+                ctx.fillStyle = "#ff0055";
+                ctx.beginPath();
+                ctx.arc(food.x + grid/2, food.y + grid/2, grid/2 - 1, 0, Math.PI*2);
+                ctx.fill();
+
+                snake.forEach((seg, idx) => {
+                    let pct = 1 - (idx / snake.length);
+                    ctx.fillStyle = idx === 0 ? "#00ffcc" : `rgba(0, 153, 255, ${pct})`;
+                    ctx.shadowColor = idx === 0 ? "#00ffcc" : "#0099ff";
+                    ctx.shadowBlur = idx === 0 ? 15 : 5;
+                    ctx.fillRect(seg.x + 1, seg.y + 1, grid - 2, grid - 2);
+                });
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
         }
 
-        // MEMORY MATCH GAME
-        function initMemory(canvas, ctx, startBtn, pauseBtn, resumeBtn) {
-            const cards = [];
-            const symbols = ['⭐', '🎮', '🚀', '💎', '⚡', '🌟', '🎯', '🔥'];
-            
-            for (let i = 0; i < 16; i++) {
-                cards.push({
-                    symbol: symbols[i % 8],
-                    revealed: false,
-                    matched: false,
-                    x: (i % 4) * 150 + 50,
-                    y: Math.floor(i / 4) * 80 + 50,
-                    width: 120,
-                    height: 60
+        // ==========================================
+        // 2. MATRIX MATCH SYSTEM UPGRADE ENGINE
+        // ==========================================
+        function setupMemory() {
+            let cards, flipped, matches, score, clicks, canClick;
+            const symbols = ['⚡', '👾', '🚀', '💎', '🎯', '🔥', '🔮', '👑'];
+            const cols = 4, rows = 4;
+            const w = 100, h = 100;
+            const startX = (800 - (cols * 130)) / 2;
+            const startY = (450 - (rows * 115)) / 2;
+
+            function initGrid() {
+                let pool = [...symbols, ...symbols];
+                for(let i=pool.length-1; i>0; i--) {
+                    let j = Math.floor(Math.random() * (i+1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+
+                cards = [];
+                for(let i=0; i<16; i++) {
+                    let r = Math.floor(i / cols);
+                    let c = i % cols;
+                    cards.push({
+                        id: i, symbol: pool[i],
+                        x: startX + c * 130, y: startY + r * 115,
+                        flipped: false, matched: false, flipAnim: 0
+                    });
+                }
+            }
+
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    initGrid();
+                    flipped = []; matches = 0; score = 0; clicks = 0; canClick = true;
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00000";
+                    canvas.onclick = handleCanvasClick;
+                    loop();
+                }
+            };
+
+            function handleCanvasClick(e) {
+                if(!canClick) return;
+                const rect = canvas.getBoundingClientRect();
+                const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+                for(let card of cards) {
+                    if(!card.flipped && !card.matched && mx > card.x && mx < card.x + w && my > card.y && my < card.y + h) {
+                        card.flipped = true;
+                        flipped.push(card);
+                        clicks++;
+                        
+                        if(flipped.length === 2) {
+                            canClick = false;
+                            let [c1, c2] = flipped;
+                            if(c1.symbol === c2.symbol) {
+                                setTimeout(() => {
+                                    c1.matched = true; c2.matched = true;
+                                    matches++; score += 500;
+                                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                                    createExplosion(c1.x + w/2, c1.y + h/2, '#00ffcc', 20);
+                                    createExplosion(c2.x + w/2, c2.y + h/2, '#00ffcc', 20);
+                                    applyScreenShake(5);
+                                    flipped = []; canClick = true;
+                                    if(matches === 8) win();
+                                }, 300);
+                            } else {
+                                setTimeout(() => {
+                                    c1.flipped = false; c2.flipped = false;
+                                    flipped = []; canClick = true;
+                                    if(score > 50) score -= 50;
+                                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                                }, 1000);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            function win() {
+                applyScreenShake(15);
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('startBtn').textContent = "RESTART DATA SYNC";
+            }
+
+            function loop() {
+                if(matches === 8) { render(); return; }
+                animationId = requestAnimationFrame(loop);
+                
+                cards.forEach(c => {
+                    if(c.flipped || c.matched) { if(c.flipAnim < 1) c.flipAnim += 0.1; }
+                    else { if(c.flipAnim > 0) c.flipAnim -= 0.1; }
+                });
+
+                render();
+            }
+
+            function render() {
+                preRenderFrame();
+
+                cards.forEach(c => {
+                    ctx.save();
+                    ctx.translate(c.x + w/2, c.y + h/2);
+                    let scaleX = Math.abs(1 - c.flipAnim * 2);
+                    ctx.scale(scaleX, 1);
+
+                    ctx.shadowBlur = 10;
+                    if(c.flipAnim < 0.5) {
+                        ctx.fillStyle = "rgba(13, 22, 54, 0.9)";
+                        ctx.strokeStyle = "rgba(0, 255, 204, 0.4)";
+                        ctx.shadowColor = "rgba(0, 255, 204, 0.2)";
+                        ctx.lineWidth = 2;
+                        ctx.fillRect(-w/2, -h/2, w, h);
+                        ctx.strokeRect(-w/2, -h/2, w, h);
+                        
+                        ctx.strokeStyle = "rgba(0, 255, 204, 0.1)";
+                        ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.moveTo(0, -10); ctx.lineTo(0, 10); ctx.stroke();
+                    } else {
+                        ctx.fillStyle = c.matched ? "rgba(4, 46, 36, 0.9)" : "rgba(10, 36, 74, 0.9)";
+                        ctx.strokeStyle = c.matched ? "#00ffcc" : "#0099ff";
+                        ctx.shadowColor = c.matched ? "#00ffcc" : "#0099ff";
+                        ctx.lineWidth = 2;
+                        ctx.fillRect(-w/2, -h/2, w, h);
+                        ctx.strokeRect(-w/2, -h/2, w, h);
+
+                        ctx.scale(-1, 1); 
+                        ctx.fillStyle = "#fff";
+                        ctx.font = "32px sans-serif";
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(c.symbol, 0, 0);
+                    }
+                    ctx.restore();
+                });
+
+                if(matches === 8) {
+                    ctx.fillStyle = "#00ffcc";
+                    ctx.font = "bold 40px 'Orbitron'";
+                    ctx.textAlign = "center";
+                    ctx.fillText("SYNCHRONIZATION COMPLETE", canvas.width/2, 80);
+                }
+
+                postRenderFrame();
+            }
+
+            initGrid();
+            render();
+        }
+
+        // ==========================================
+        // 3. CYBER BIRD SYSTEM UPGRADE ENGINE
+        // ==========================================
+        function setupFlappy() {
+            let birdY, birdV, score, pipes, isRunning;
+            const gravity = 0.4, jump = -6.5;
+            let targetPipeSpeed = 3.5;
+
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    birdY = 200; birdV = 0; score = 0; isRunning = true;
+                    pipes = [];
+                    spawnPipe();
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00000";
+                    
+                    window.addEventListener('keydown', handleJump);
+                    canvas.onclick = () => birdV = jump;
+                    loop();
+                }
+            };
+
+            function handleJump(e) { if(e.key === ' ' || e.key === 'ArrowUp') birdV = jump; }
+            function spawnPipe() {
+                let gap = 130;
+                let minH = 40;
+                let topH = Math.floor(Math.random() * (canvas.height - gap - minH * 2)) + minH;
+                pipes.push({ x: canvas.width, top: topH, bottom: canvas.height - topH - gap, w: 60, passed: false });
+            }
+
+            function loop() {
+                if(!isRunning) return;
+                animationId = requestAnimationFrame(loop);
+
+                birdV += gravity;
+                birdY += birdV;
+
+                if(birdY < 0 || birdY > canvas.height) { gameOver(); return; }
+
+                for(let i=pipes.length-1; i>=0; i--) {
+                    let p = pipes[i];
+                    p.x -= targetPipeSpeed;
+
+                    let birdRadius = 14;
+                    let checkX = (200 + birdRadius > p.x && 200 - birdRadius < p.x + p.w);
+                    let checkTopY = (birdY - birdRadius < p.top);
+                    let checkBotY = (birdY + birdRadius > canvas.height - p.bottom);
+                    
+                    if(checkX && (checkTopY || checkBotY)) { gameOver(); return; }
+
+                    if(!p.passed && p.x + p.w < 200) {
+                        p.passed = true;
+                        score += 100;
+                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        applyScreenShake(6);
+                        if(score % 500 === 0) targetPipeSpeed += 0.5; 
+                    }
+
+                    if(p.x + p.w < 0) pipes.splice(i, 1);
+                }
+
+                if(pipes.length > 0 && pipes[pipes.length-1].x < canvas.width - 250) spawnPipe();
+
+                render();
+            }
+
+            function gameOver() {
+                isRunning = false;
+                applyScreenShake(30);
+                createExplosion(200, birdY, '#ff0055', 35);
+                window.removeEventListener('keydown', handleJump);
+                canvas.onclick = null;
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('startBtn').textContent = "CYCLE FIREWALL MATRIX";
+            }
+
+            function render() {
+                preRenderFrame();
+
+                pipes.forEach(p => {
+                    ctx.save();
+                    ctx.shadowBlur = 15;
+                    
+                    let topGrd = ctx.createLinearGradient(p.x, 0, p.x + p.w, 0);
+                    topGrd.addColorStop(0, "rgba(255, 0, 85, 0.8)"); topGrd.addColorStop(1, "rgba(150, 0, 50, 0.8)");
+                    ctx.fillStyle = topGrd; ctx.strokeStyle = "#ff0055"; ctx.shadowColor = "#ff0055";
+                    ctx.fillRect(p.x, 0, p.w, p.top); ctx.strokeRect(p.x, -5, p.w, p.top + 5);
+
+                    let botGrd = ctx.createLinearGradient(p.x, canvas.height - p.bottom, p.x + p.w, canvas.height);
+                    botGrd.addColorStop(0, "rgba(255, 0, 85, 0.8)"); botGrd.addColorStop(1, "rgba(150, 0, 50, 0.8)");
+                    ctx.fillStyle = botGrd; ctx.strokeStyle = "#ff0055"; ctx.shadowColor = "#ff0055";
+                    ctx.fillRect(p.x, canvas.height - p.bottom, p.w, p.bottom);
+                    ctx.strokeRect(p.x, canvas.height - p.bottom, p.w, p.bottom + 5);
+
+                    ctx.restore();
+                });
+
+                ctx.save();
+                ctx.translate(200, birdY);
+                let angle = Math.min(Math.max(-0.4, birdV / 12), 0.7);
+                ctx.rotate(angle);
+                
+                ctx.shadowBlur = 20; ctx.shadowColor = "#00ffcc";
+                ctx.fillStyle = "#00ffcc";
+                ctx.beginPath();
+                ctx.arc(0, 0, 14, 0, Math.PI*2);
+                ctx.fill();
+                
+                ctx.fillStyle = "#020212";
+                ctx.beginPath(); ctx.arc(6, -4, 3, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#fff"; ctx.fillRect(-8, -2, 10, 4);
+                ctx.restore();
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
+        }
+
+        // ==========================================
+        // 4. 3D DICE 21 SYSTEM UPGRADE ENGINE
+        // ==========================================
+        function setupDice() {
+            let playerTotal, isRolling, currentRoll, messageText, gameActive;
+            let rollAngleX = 0, rollAngleY = 0, targetAngleX = 0, targetAngleY = 0;
+
+            const startBtn = document.getElementById('startBtn');
+            const actionBtn = document.getElementById('actionBtn');
+
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    playerTotal = 0; currentRoll = 1; isRolling = false; gameActive = true;
+                    messageText = "Roll initialization loop prepared.";
+                    startBtn.classList.add('hidden');
+                    actionBtn.classList.remove('hidden');
+                    actionBtn.textContent = "STICK SELECTION";
+                    
+                    rollDiceSequence();
+                    loop();
+                },
+                actionCallback: function() {
+                    if(!gameActive || isRolling) return;
+                    gameActive = false;
+                    evaluateFinalOutcome(true);
+                }
+            };
+
+            function rollDiceSequence() {
+                if(isRolling || !gameActive) return;
+                isRolling = true;
+                messageText = "Rolling physical matrix calculations...";
+                
+                let rollTicks = 0;
+                let maxTicks = 45;
+
+                function tickRoll() {
+                    rollAngleX += (Math.random() * 0.4 + 0.2);
+                    rollAngleY += (Math.random() * 0.4 + 0.2);
+                    
+                    rollTicks++;
+                    if(rollTicks < maxTicks) {
+                        setTimeout(tickRoll, 20);
+                    } else {
+                        currentRoll = Math.floor(Math.random() * 6) + 1;
+                        const faceRotations = {
+                            1: {x: 0, y: 0}, 6: {x: Math.PI, y: 0},
+                            2: {x: 0, y: Math.PI/2}, 5: {x: 0, y: -Math.PI/2},
+                            3: {x: -Math.PI/2, y: 0}, 4: {x: Math.PI/2, y: 0}
+                        };
+                        targetAngleX = faceRotations[currentRoll].x;
+                        targetAngleY = faceRotations[currentRoll].y;
+                        
+                        playerTotal += currentRoll;
+                        document.getElementById('gameScore').textContent = String(playerTotal).padStart(5, '0');
+                        applyScreenShake(12);
+                        createExplosion(canvas.width/2, canvas.height/2, '#b55fe6', 25);
+                        isRolling = false;
+
+                        evaluateFinalOutcome(false);
+                    }
+                }
+                tickRoll();
+            }
+
+            function evaluateFinalOutcome(forcedStick) {
+                if(playerTotal === 21) {
+                    messageText = "CRITICAL QUANTUM HIT: Exact calculation index reached!";
+                    endGameSequence();
+                } else if(playerTotal > 21) {
+                    messageText = "OVERLOAD FAILURE: Buffer threshold exceeded value 21.";
+                    endGameSequence();
+                } else {
+                    if(forcedStick) {
+                        if(playerTotal >= 17) messageText = `System analysis verified operational baseline execution at score: ${playerTotal}`;
+                        else messageText = `Failure logic baseline: Sticking too early beneath security limits at value: ${playerTotal}`;
+                        endGameSequence();
+                    } else {
+                        messageText = `Analyzed value: ${playerTotal}. Execute choice sequence options.`;
+                        canvas.onclick = rollDiceSequence;
+                    }
+                }
+            }
+
+            function endGameSequence() {
+                gameActive = false;
+                canvas.onclick = null;
+                actionBtn.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+                startBtn.textContent = "REBOOT MATRIX DICE";
+            }
+
+            function loop() {
+                animationId = requestAnimationFrame(loop);
+                
+                if(!isRolling) {
+                    rollAngleX += (targetAngleX - rollAngleX) * 0.15;
+                    rollAngleY += (targetAngleY - rollAngleY) * 0.15;
+                }
+                render();
+            }
+
+            const vertices = [
+                {x:-1, y:-1, z: 1}, {x: 1, y:-1, z: 1}, {x: 1, y: 1, z: 1}, {x:-1, y: 1, z: 1},
+                {x:-1, y:-1, z:-1}, {x: 1, y:-1, z:-1}, {x: 1, y: 1, z:-1}, {x:-1, y: 1, z:-1}
+            ];
+            const faces = [
+                {verts:[0,1,2,3], dotColor:"#ff0055", label:1, dots:[{x:0,y:0}]}, 
+                {verts:[5,4,7,6], dotColor:"#00ffcc", label:6, dots:[{x:-0.5,y:-0.5},{x:0.5,y:-0.5},{x:-0.5,y:0},{x:0.5,y:0},{x:-0.5,y:0.5},{x:0.5,y:0.5}]}, 
+                {verts:[1,5,6,2], dotColor:"#0099ff", label:2, dots:[{x:-0.4,y:-0.4},{x:0.4,y:0.4}]}, 
+                {verts:[4,0,3,7], dotColor:"#ffaa00", label:5, dots:[{x:-0.4,y:-0.4},{x:0.4,y:-0.4},{x:0,y:0},{x:-0.4,y:0.4},{x:0.4,y:0.4}]}, 
+                {verts:[4,5,1,0], dotColor:"#ff00ff", label:3, dots:[{x:-0.4,y:-0.4},{x:0,y:0},{x:0.4,y:0.4}]}, 
+                {verts:[3,2,6,7], dotColor:"#00ff00", label:4, dots:[{x:-0.4,y:-0.4},{x:0.4,y:-0.4},{x:-0.4,y:0.4},{x:0.4,y:0.4}]}  
+            ];
+
+            function project3D(x, y, z) {
+                let radX = rollAngleX, radY = rollAngleY;
+                let x1 = x * Math.cos(radY) - z * Math.sin(radY);
+                let z1 = x * Math.sin(radY) + z * Math.cos(radY);
+                let y2 = y * Math.cos(radX) - z1 * Math.sin(radX);
+                let z2 = y * Math.sin(radX) + z1 * Math.cos(radX);
+                
+                let scaleFactor = 160 / (z2 + 4); 
+                return {
+                    x: canvas.width / 2 + x1 * scaleFactor,
+                    y: canvas.height / 2 - 40 + y2 * scaleFactor,
+                    z: z2
+                };
+            }
+
+            function render() {
+                preRenderFrame();
+
+                let renderedFaces = faces.map(f => {
+                    let pts = f.verts.map(v => project3D(vertices[v].x, vertices[v].y, vertices[v].z));
+                    let compVector1 = { x: pts[1].x - pts[0].x, y: pts[1].y - pts[0].y };
+                    let compVector2 = { x: pts[2].x - pts[0].x, y: pts[2].y - pts[0].y };
+                    let normalZ = compVector1.x * compVector2.y - compVector1.y * compVector2.x;
+                    return { face: f, points: pts, avgZ: pts.reduce((sum,p)=>sum+p.z, 0)/4, normalZ: normalZ };
+                });
+
+                renderedFaces.sort((a,b) => b.avgZ - a.avgZ);
+
+                renderedFaces.forEach(rf => {
+                    if(rf.normalZ < 0) return; 
+
+                    ctx.save();
+                    ctx.fillStyle = "rgba(18, 10, 43, 0.95)";
+                    ctx.strokeStyle = "#b55fe6";
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 20; ctx.shadowColor = "#b55fe6";
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(rf.points[0].x, rf.points[0].y);
+                    for(let i=1; i<4; i++) ctx.lineTo(rf.points[i].x, rf.points[i].y);
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+
+                    let cx = rf.points.reduce((s,p)=>s+p.x,0)/4;
+                    let cy = rf.points.reduce((s,p)=>s+p.y,0)/4;
+
+                    rf.face.dots.forEach(d => {
+                        let dx = d.x * (rf.points[1].x - rf.points[0].x) + d.y * (rf.points[3].x - rf.points[0].x);
+                        let dy = d.x * (rf.points[1].y - rf.points[0].y) + d.y * (rf.points[3].y - rf.points[0].y);
+                        
+                        ctx.fillStyle = rf.face.dotColor;
+                        ctx.shadowBlur = 8; ctx.shadowColor = rf.face.dotColor;
+                        ctx.beginPath();
+                        ctx.arc(cx + dx, cy + dy, 6, 0, Math.PI*2);
+                        ctx.fill();
+                    });
+                    ctx.restore();
+                });
+
+                ctx.fillStyle = gameActive ? "#00ffcc" : "#ff0055";
+                ctx.font = "bold 20px 'Orbitron'";
+                ctx.textBaseline = "middle"; ctx.textAlign = "center";
+                ctx.fillText(messageText, canvas.width/2, canvas.height - 50);
+
+                if(gameActive && !isRolling) {
+                    ctx.fillStyle = "rgba(255,255,255,0.3)";
+                    ctx.font = "12px 'Outfit'";
+                    ctx.fillText("[ CLICK CANVAS WRAPPER TO DISCHARGE NEXT VALUE MODULE ]", canvas.width/2, canvas.height - 20);
+                }
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
+        }
+
+        // ==========================================
+        // 5. QUANTUM CLICKER SYSTEM UPGRADE ENGINE
+        // ==========================================
+        function setupClicker() {
+            let score, timeLeft, activeTargets, isRunning, lastSpawn;
+            let targetFrequency = 900; 
+
+            function spawnTarget() {
+                let r = Math.random() * 20 + 15; 
+                let margin = 50;
+                let isGolden = Math.random() < 0.15; 
+                activeTargets.push({
+                    x: Math.random() * (canvas.width - margin*2) + margin,
+                    y: Math.random() * (canvas.height - margin*2) + margin,
+                    radius: r, maxRadius: r + (isGolden ? 15 : 5), pulseDir: 1,
+                    isGolden: isGolden, life: 1.0, decay: Math.random() * 0.01 + 0.008
                 });
             }
 
-            gameState = {
-                cards: cards,
-                flipped: [],
-                matches: 0,
-                score: 0,
-                running: false,
-                paused: false,
-                action: null
-            };
-
-            startBtn.textContent = 'Start Game';
-            startBtn.style.display = 'block';
-            pauseBtn.style.display = 'none';
-
-            startBtn.onclick = function() {
-                if (!gameState.running) {
-                    gameState.running = true;
-                    gameState.flipped = [];
-                    gameState.matches = 0;
-                    gameState.score = 0;
-                    startBtn.style.display = 'none';
-                    pauseBtn.style.display = 'block';
-                    playMemory(canvas, ctx, pauseBtn, resumeBtn, startBtn);
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    score = 0; timeLeft = 30.0; activeTargets = []; isRunning = true; lastSpawn = 0;
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00000";
+                    
+                    canvas.onclick = handleClickInputTrace;
+                    loop();
                 }
             };
 
-            canvas.onclick = function(e) {
-                if (!gameState.running || gameState.flipped.length >= 2) return;
+            function handleClickInputTrace(e) {
                 const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const my = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-                for (let card of gameState.cards) {
-                    if (x > card.x && x < card.x + card.width && 
-                        y > card.y && y < card.y + card.height && 
-                        !card.matched && !card.revealed) {
-                        card.revealed = true;
-                        gameState.flipped.push(card);
+                let hitRegistered = false;
+                for(let i=activeTargets.length-1; i>=0; i--) {
+                    let t = activeTargets[i];
+                    let dist = Math.hypot(mx - t.x, my - t.y);
+                    if(dist < t.radius + 5) {
+                        hitRegistered = true;
+                        let pointsGained = t.isGolden ? 500 : 100;
+                        score += pointsGained;
+                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        
+                        applyScreenShake(t.isGolden ? 12 : 5);
+                        createExplosion(t.x, t.y, t.isGolden ? "#ffaa00" : "#00ffcc", 20);
+                        activeTargets.splice(i, 1);
                         break;
                     }
                 }
-
-                if (gameState.flipped.length === 2) {
-                    if (gameState.flipped[0].symbol === gameState.flipped[1].symbol) {
-                        gameState.flipped[0].matched = true;
-                        gameState.flipped[1].matched = true;
-                        gameState.score += 10;
-                        gameState.matches++;
-                    }
-                    setTimeout(() => {
-                        gameState.flipped[0].revealed = false;
-                        gameState.flipped[1].revealed = false;
-                        gameState.flipped = [];
-                    }, 800);
-                }
-            };
-
-            function playMemory(canvas, ctx, pauseBtn, resumeBtn, startBtn) {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                for (let card of gameState.cards) {
-                    ctx.fillStyle = card.matched ? rgba(0, 255, 0, 0.1) : rgba(0, 255, 0, 0.3);
-                    ctx.fillRect(card.x, card.y, card.width, card.height);
-                    ctx.strokeStyle = '#00ff00';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(card.x, card.y, card.width, card.height);
-
-                    if (card.revealed || card.matched) {
-                        ctx.fillStyle = '#00ff00';
-                        ctx.font = '48px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(card.symbol, card.x + card.width/2, card.y + card.height/2);
-                    }
-                }
-
-                document.getElementById('gameScore').textContent = `Score: ${gameState.score} | Matches: ${gameState.matches}/8`;
-
-                if (gameState.matches === 8) {
-                    gameState.running = false;
-                    pauseBtn.style.display = 'none';
-                    startBtn.style.display = 'block';
-                    startBtn.textContent = 'You Won! Play Again?';
-                    document.getElementById('gameScore').textContent = `Score: ${gameState.score} - YOU WON!`;
-                    return;
-                }
-
-                animationId = requestAnimationFrame(() => playMemory(canvas, ctx, pauseBtn, resumeBtn, startBtn));
-            }
-
-            function rgba(r, g, b, a) {
-                return `rgba(${r}, ${g}, ${b}, ${a})`;
-            }
-
-            playMemory(canvas, ctx, pauseBtn, resumeBtn, startBtn);
-        }
-
-        // FLAPPY BIRD GAME
-        function initFlappy(canvas, ctx, startBtn, pauseBtn, resumeBtn) {
-            gameState = {
-                bird: {x: 50, y: canvas.height / 2, width: 20, height: 20, velocity: 0},
-                pipes: [],
-                score: 0,
-                running: false,
-                paused: false,
-                gameOver: false,
-                pipeCount: 0,
-                action: null
-            };
-
-            startBtn.textContent = 'Start Game';
-            startBtn.style.display = 'block';
-            pauseBtn.style.display = 'none';
-
-            function jump() {
-                if (gameState.running && !gameState.paused) {
-                    gameState.bird.velocity = -8;
+                if(!hitRegistered && score >= 50) { 
+                    score -= 50; 
+                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0'); 
                 }
             }
 
-            startBtn.onclick = function() {
-                if (!gameState.running) {
-                    gameState.running = true;
-                    gameState.gameOver = false;
-                    gameState.bird = {x: 50, y: canvas.height / 2, width: 20, height: 20, velocity: 0};
-                    gameState.pipes = [];
-                    gameState.score = 0;
-                    gameState.pipeCount = 0;
-                    startBtn.style.display = 'none';
-                    pauseBtn.style.display = 'block';
-                    playFlappy(canvas, ctx, pauseBtn, resumeBtn, startBtn);
-                }
-            };
+            function loop() {
+                if(!isRunning) return;
+                animationId = requestAnimationFrame(loop);
 
-            document.onkeydown = function(e) {
-                if (e.code === 'Space') {
-                    e.preventDefault();
-                    jump();
-                }
-            };
+                timeLeft -= 1/60; 
+                if(timeLeft <= 0) { timeLeft = 0; gameOver(); return; }
 
-            canvas.onclick = jump;
-
-            function playFlappy(canvas, ctx, pauseBtn, resumeBtn, startBtn) {
-                if (gameState.action === 'pause') {
-                    gameState.paused = true;
-                    gameState.action = null;
-                    pauseBtn.style.display = 'none';
-                    resumeBtn.style.display = 'block';
-                    drawFlappy(canvas, ctx);
-                    return;
-                }
-                if (gameState.action === 'resume') {
-                    gameState.paused = false;
-                    gameState.action = null;
-                    pauseBtn.style.display = 'block';
-                    resumeBtn.style.display = 'none';
+                let now = performance.now();
+                if(now - lastSpawn > targetFrequency) {
+                    spawnTarget(); lastSpawn = now;
+                    if(targetFrequency > 400) targetFrequency -= 10;
                 }
 
-                if (gameState.paused) {
-                    animationId = requestAnimationFrame(() => playFlappy(canvas, ctx, pauseBtn, resumeBtn, startBtn));
-                    return;
-                }
-
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                gameState.bird.velocity += 0.4;
-                gameState.bird.y += gameState.bird.velocity;
-
-                if (gameState.pipeCount % 80 === 0) {
-                    const gapSize = 100;
-                    const gapY = Math.random() * (canvas.height - gapSize - 50) + 25;
-                    gameState.pipes.push({x: canvas.width, topHeight: gapY, gapHeight: gapSize});
-                    gameState.pipeCount = 0;
-                }
-                gameState.pipeCount++;
-
-                for (let i = gameState.pipes.length - 1; i >= 0; i--) {
-                    gameState.pipes[i].x -= 5;
+                for(let i=activeTargets.length-1; i>=0; i--) {
+                    let t = activeTargets[i];
+                    t.life -= t.decay;
+                    if(t.life <= 0) { activeTargets.splice(i, 1); continue; }
                     
-                    if (gameState.pipes[i].x < -50) {
-                        gameState.pipes.splice(i, 1);
-                        gameState.score++;
-                    }
+                    t.radius += 0.15 * t.pulseDir;
+                    if(t.radius > t.maxRadius || t.radius < 10) t.pulseDir *= -1;
                 }
 
-                if (gameState.bird.y + gameState.bird.height > canvas.height || gameState.bird.y < 0) {
-                    gameState.gameOver = true;
-                    gameState.running = false;
-                    pauseBtn.style.display = 'none';
-                    startBtn.style.display = 'block';
-                    startBtn.textContent = 'Game Over! Try Again?';
-                    document.getElementById('gameScore').textContent = `Score: ${gameState.score} - Game Over!`;
-                    drawFlappy(canvas, ctx);
-                    return;
-                }
-
-                for (let pipe of gameState.pipes) {
-                    if (gameState.bird.x < pipe.x + 50 && gameState.bird.x + gameState.bird.width > pipe.x) {
-                        if (gameState.bird.y < pipe.topHeight || gameState.bird.y + gameState.bird.height > pipe.topHeight + pipe.gapHeight) {
-                            gameState.gameOver = true;
-                            gameState.running = false;
-                            pauseBtn.style.display = 'none';
-                            startBtn.style.display = 'block';
-                            startBtn.textContent = 'Game Over! Try Again?';
-                            document.getElementById('gameScore').textContent = `Score: ${gameState.score} - Game Over!`;
-                            drawFlappy(canvas, ctx);
-                            return;
-                        }
-                    }
-                }
-
-                drawFlappy(canvas, ctx);
-                document.getElementById('gameScore').textContent = `Score: ${gameState.score}`;
-
-                animationId = requestAnimationFrame(() => playFlappy(canvas, ctx, pauseBtn, resumeBtn, startBtn));
+                render();
             }
 
-            function drawFlappy(canvas, ctx) {
-                // Draw pipes
-                ctx.fillStyle = '#ff6b6b';
-                for (let pipe of gameState.pipes) {
-                    ctx.fillRect(pipe.x, 0, 50, pipe.topHeight);
-                    ctx.fillRect(pipe.x, pipe.topHeight + pipe.gapHeight, 50, canvas.height - pipe.topHeight - pipe.gapHeight);
-                }
-
-                // Draw bird
-                ctx.fillStyle = '#ffeb3b';
-                ctx.fillRect(gameState.bird.x, gameState.bird.y, gameState.bird.width, gameState.bird.height);
-                ctx.strokeStyle = '#00ff00';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(gameState.bird.x, gameState.bird.y, gameState.bird.width, gameState.bird.height);
-            }
-        }
-
-        // DICE GAME
-        function initDice(canvas, ctx, startBtn, pauseBtn, resumeBtn) {
-            gameState = {
-                playerSum: 0,
-                computerSum: 0,
-                playerStanding: false,
-                computerTurn: false,
-                gameOver: false,
-                running: false,
-                rolls: [],
-                action: null
-            };
-
-            startBtn.textContent = 'Start Game';
-            startBtn.style.display = 'block';
-            pauseBtn.style.display = 'none';
-
-            startBtn.onclick = function() {
-                if (!gameState.running) {
-                    gameState.running = true;
-                    gameState.playerSum = 0;
-                    gameState.computerSum = 0;
-                    gameState.playerStanding = false;
-                    gameState.computerTurn = false;
-                    gameState.gameOver = false;
-                    gameState.rolls = [];
-                    startBtn.style.display = 'none';
-                    pauseBtn.textContent = 'Roll Dice';
-                    pauseBtn.style.display = 'block';
-                    pauseBtn.onclick = function() { if (gameState.running) rollDice(); };
-                    playDice(canvas, ctx, pauseBtn, startBtn);
-                }
-            };
-
-            function rollDice() {
-                if (gameState.playerStanding) return;
-                const roll = Math.floor(Math.random() * 6) + 1;
-                gameState.playerSum += roll;
-                gameState.rolls.push({value: roll, isPlayer: true});
-
-                if (gameState.playerSum > 21) {
-                    gameState.gameOver = true;
-                    gameState.running = false;
-                    pauseBtn.style.display = 'none';
-                    startBtn.style.display = 'block';
-                    startBtn.textContent = 'Bust! Play Again?';
-                    document.getElementById('gameScore').textContent = `You: ${gameState.playerSum} - BUST! Computer Wins!`;
-                }
-                playDice(canvas, ctx, pauseBtn, startBtn);
+            function gameOver() {
+                isRunning = false;
+                canvas.onclick = null;
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('startBtn').textContent = "REENGAGE QUANTUM MATRIX";
             }
 
-            document.onkeydown = function(e) {
-                if (e.key === ' ') {
-                    e.preventDefault();
-                    rollDice();
-                } else if (e.key === 'Enter' && !gameState.playerStanding) {
-                    gameState.playerStanding = true;
-                    pauseBtn.textContent = 'Computer Turn...';
-                    pauseBtn.disabled = true;
+            function render() {
+                preRenderFrame();
+
+                activeTargets.forEach(t => {
+                    ctx.save();
+                    ctx.globalAlpha = t.life;
+                    ctx.shadowBlur = t.isGolden ? 25 : 15;
+                    ctx.shadowColor = t.isGolden ? "#ffaa00" : "#00ffcc";
                     
-                    setTimeout(() => {
-                        gameState.computerTurn = true;
-                        computerPlay(canvas, ctx, pauseBtn, startBtn);
-                    }, 1000);
-                }
-            };
-
-            function computerPlay(canvas, ctx, pauseBtn, startBtn) {
-                if (gameState.computerSum < 17) {
-                    const roll = Math.floor(Math.random() * 6) + 1;
-                    gameState.computerSum += roll;
-                    gameState.rolls.push({value: roll, isPlayer: false});
-                    
-                    if (gameState.computerSum > 21) {
-                        gameState.gameOver = true;
-                        document.getElementById('gameScore').textContent = `You: ${gameState.playerSum} vs Computer: ${gameState.computerSum} - YOU WIN!`;
-                    } else if (gameState.computerSum >= 17) {
-                        gameState.gameOver = true;
-                        if (gameState.computerSum >= gameState.playerSum) {
-                            document.getElementById('gameScore').textContent = `You: ${gameState.playerSum} vs Computer: ${gameState.computerSum} - Computer Wins!`;
-                        } else {
-                            document.getElementById('gameScore').textContent = `You: ${gameState.playerSum} vs Computer: ${gameState.computerSum} - YOU WIN!`;
-                        }
-                    }
-
-                    playDice(canvas, ctx, pauseBtn, startBtn);
-                    if (!gameState.gameOver) {
-                        setTimeout(() => computerPlay(canvas, ctx, pauseBtn, startBtn), 800);
+                    let glow = ctx.createRadialGradient(t.x, t.y, t.radius * 0.2, t.x, t.y, t.radius);
+                    if(t.isGolden) {
+                        glow.addColorStop(0, "#ffffff"); glow.addColorStop(0.3, "#ffaa00"); glow.addColorStop(1, "rgba(255, 170, 0, 0)");
                     } else {
-                        gameState.running = false;
-                        pauseBtn.style.display = 'none';
-                        startBtn.style.display = 'block';
-                        startBtn.textContent = 'Play Again?';
+                        glow.addColorStop(0, "#ffffff"); glow.addColorStop(0.3, "#00ffcc"); glow.addColorStop(1, "rgba(0, 255, 204, 0)");
                     }
+                    
+                    ctx.fillStyle = glow;
+                    ctx.beginPath(); ctx.arc(t.x, t.y, t.radius, 0, Math.PI*2); ctx.fill();
+                    
+                    ctx.strokeStyle = t.isGolden ? "#ffaa00" : "#00ffcc";
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(t.x, t.y, t.radius + 3, 0, Math.PI*2); ctx.stroke();
+                    ctx.restore();
+                });
+
+                ctx.fillStyle = timeLeft < 5 ? "#ff0055" : "#fff";
+                ctx.font = "bold 22px 'Orbitron'";
+                ctx.textAlign = "left";
+                ctx.fillText(`TIME_REMAINING: ${timeLeft.toFixed(2)}s`, 25, 40);
+
+                if(!isRunning) {
+                    ctx.fillStyle = "#ff0055";
+                    ctx.font = "bold 50px 'Orbitron'";
+                    ctx.textAlign = "center";
+                    ctx.fillText("MATRIX LIFECYCLE EXPIRED", canvas.width/2, canvas.height/2);
                 }
+
+                postRenderFrame();
             }
 
-            function playDice(canvas, ctx, pauseBtn, startBtn) {
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#00ff00';
-                ctx.font = '20px Arial';
-                ctx.textAlign = 'left';
-                ctx.fillText('PLAYER ROLLS:', 20, 40);
-                let yPos = 70;
-                let playerRolls = gameState.rolls.filter(r => r.isPlayer);
-                for (let roll of playerRolls.slice(-10)) {
-                    ctx.font = '18px Arial';
-                    ctx.fillText(roll.value, 20, yPos);
-                    yPos += 25;
-                }
-
-                ctx.fillStyle = '#ff6b6b';
-                ctx.font = '24px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(`Player Sum: ${gameState.playerSum}`, canvas.width / 2, 100);
-
-                if (gameState.computerTurn) {
-                    ctx.fillStyle = '#ffeb3b';
-                    ctx.font = '20px Arial';
-                    ctx.textAlign = 'right';
-                    ctx.fillText('COMPUTER ROLLS:', canvas.width - 20, 40);
-                    yPos = 70;
-                    let computerRolls = gameState.rolls.filter(r => !r.isPlayer);
-                    for (let roll of computerRolls.slice(-10)) {
-                        ctx.font = '18px Arial';
-                        ctx.textAlign = 'right';
-                        ctx.fillText(roll.value, canvas.width - 20, yPos);
-                        yPos += 25;
-                    }
-
-                    ctx.fillStyle = '#ffeb3b';
-                    ctx.font = '24px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(`Computer Sum: ${gameState.computerSum}`, canvas.width / 2, 200);
-                }
-
-                ctx.font = '16px Arial';
-                ctx.fillStyle = '#00cc00';
-                ctx.textAlign = 'center';
-                if (!gameState.playerStanding) {
-                    ctx.fillText('Press SPACE to Roll | ENTER to Stand', canvas.width / 2, canvas.height - 20);
-                }
-            }
-
-            playDice(canvas, ctx, pauseBtn, startBtn);
+            preRenderFrame();
+            postRenderFrame();
         }
 
-        // STAR CLICKER GAME
-        function initClicker(canvas, ctx, startBtn, pauseBtn, resumeBtn) {
-            gameState = {
-                stars: [],
-                score: 0,
-                timeLeft: 30,
-                running: false,
-                startTime: null,
-                action: null
-            };
+        // ==========================================
+        // 6. PONG LOGIC PROTOCOL SYSTEM ENGINE
+        // ==========================================
+        function setupPong() {
+            let p1Y, p2Y, ballX, ballY, vx, vy, p1Score, p2Score, isRunning;
+            const padW = 12, padH = 90, ballRadius = 8;
+            let currentBallSpeed = 5.5;
 
-            startBtn.textContent = 'Start Game';
-            startBtn.style.display = 'block';
-            pauseBtn.style.display = 'none';
-
-            startBtn.onclick = function() {
-                if (!gameState.running) {
-                    gameState.running = true;
-                    gameState.score = 0;
-                    gameState.timeLeft = 30;
-                    gameState.startTime = Date.now();
-                    gameState.stars = [];
-                    startBtn.style.display = 'none';
-                    playClicker(canvas, ctx, startBtn);
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    p1Y = 180; p2Y = 180; p1Score = 0; p2Score = 0; isRunning = true;
+                    resetVectorBall(1);
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00 - 00";
+                    loop();
                 }
             };
 
-            canvas.onclick = function(e) {
-                if (!gameState.running) return;
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                for (let i = gameState.stars.length - 1; i >= 0; i--) {
-                    const star = gameState.stars[i];
-                    const dist = Math.sqrt((x - star.x) ** 2 + (y - star.y) ** 2);
-                    if (dist < 25) {
-                        gameState.stars.splice(i, 1);
-                        gameState.score++;
-                        break;
-                    }
-                }
-            };
-
-            function playClicker(canvas, ctx, startBtn) {
-                const elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
-                gameState.timeLeft = 30 - elapsed;
-
-                if (gameState.timeLeft <= 0) {
-                    gameState.running = false;
-                    gameState.timeLeft = 0;
-                    startBtn.style.display = 'block';
-                    startBtn.textContent = 'Time\'s Up! Play Again?';
-                    document.getElementById('gameScore').textContent = `Final Score: ${gameState.score} - TIME\'S UP!`;
-                    ctx.fillStyle = '#000';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#00ff00';
-                    ctx.font = '32px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(`Time\'s Up! Score: ${gameState.score}`, canvas.width / 2, canvas.height / 2);
-                    return;
-                }
-
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Add new stars randomly
-                if (Math.random() < 0.1 && gameState.stars.length < 5) {
-                    gameState.stars.push({
-                        x: Math.random() * (canvas.width - 50) + 25,
-                        y: Math.random() * (canvas.height - 50) + 25,
-                        life: 1
-                    });
-                }
-
-                // Draw stars
-                ctx.fillStyle = '#ffeb3b';
-                ctx.font = '40px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                for (let star of gameState.stars) {
-                    ctx.fillText('⭐', star.x, star.y);
-                }
-
-                ctx.font = '24px Arial';
-                ctx.fillStyle = '#00ff00';
-                ctx.textAlign = 'center';
-                ctx.fillText(`Time: ${gameState.timeLeft}s`, canvas.width / 2, 40);
-
-                document.getElementById('gameScore').textContent = `Score: ${gameState.score} | Time: ${gameState.timeLeft}s`;
-
-                animationId = requestAnimationFrame(() => playClicker(canvas, ctx, startBtn));
-            }
-        }
-
-        // PONG GAME
-        function initPong(canvas, ctx, startBtn, pauseBtn, resumeBtn) {
-            gameState = {
-                paddle: {x: canvas.width / 2 - 40, y: canvas.height - 20, width: 80, height: 15},
-                ball: {x: canvas.width / 2, y: canvas.height / 2, radius: 8, vx: 5, vy: 5},
-                score: 0,
-                running: false,
-                paused: false,
-                action: null,
-                keys: {ArrowUp: false, ArrowDown: false}
-            };
-
-            startBtn.textContent = 'Start Game';
-            startBtn.style.display = 'block';
-            pauseBtn.style.display = 'none';
-
-            startBtn.onclick = function() {
-                if (!gameState.running) {
-                    gameState.running = true;
-                    gameState.score = 0;
-                    gameState.ball = {x: canvas.width / 2, y: canvas.height / 2, radius: 8, vx: 5, vy: 5};
-                    gameState.paddle = {x: canvas.width / 2 - 40, y: canvas.height - 20, width: 80, height: 15};
-                    startBtn.style.display = 'none';
-                    pauseBtn.style.display = 'block';
-                    playPong(canvas, ctx, pauseBtn, resumeBtn, startBtn);
-                }
-            };
-
-            document.onkeydown = function(e) {
-                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                    gameState.keys[e.key] = true;
-                }
-            };
-
-            document.onkeyup = function(e) {
-                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                    gameState.keys[e.key] = false;
-                }
-            };
-
-            function playPong(canvas, ctx, pauseBtn, resumeBtn, startBtn) {
-                if (gameState.action === 'pause') {
-                    gameState.paused = true;
-                    gameState.action = null;
-                    pauseBtn.style.display = 'none';
-                    resumeBtn.style.display = 'block';
-                    drawPong(canvas, ctx);
-                    return;
-                }
-                if (gameState.action === 'resume') {
-                    gameState.paused = false;
-                    gameState.action = null;
-                    pauseBtn.style.display = 'block';
-                    resumeBtn.style.display = 'none';
-                }
-
-                if (gameState.paused) {
-                    animationId = requestAnimationFrame(() => playPong(canvas, ctx, pauseBtn, resumeBtn, startBtn));
-                    return;
-                }
-
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                if (gameState.keys['ArrowUp'] && gameState.paddle.x > 0) gameState.paddle.x -= 8;
-                if (gameState.keys['ArrowDown'] && gameState.paddle.x < canvas.width - gameState.paddle.width) gameState.paddle.x += 8;
-
-                gameState.ball.x += gameState.ball.vx;
-                gameState.ball.y += gameState.ball.vy;
-
-                if (gameState.ball.x - gameState.ball.radius < 0 || gameState.ball.x + gameState.ball.radius > canvas.width) {
-                    gameState.ball.vx = -gameState.ball.vx;
-                }
-
-                if (gameState.ball.y - gameState.ball.radius < 0) {
-                    gameState.ball.vy = -gameState.ball.vy;
-                }
-
-                if (gameState.ball.y + gameState.ball.radius > gameState.paddle.y &&
-                    gameState.ball.x > gameState.paddle.x &&
-                    gameState.ball.x < gameState.paddle.x + gameState.paddle.width) {
-                    gameState.ball.vy = -gameState.ball.vy;
-                    gameState.score++;
-                }
-
-                if (gameState.ball.y > canvas.height) {
-                    gameState.running = false;
-                    pauseBtn.style.display = 'none';
-                    startBtn.style.display = 'block';
-                    startBtn.textContent = 'Game Over! Play Again?';
-                    document.getElementById('gameScore').textContent = `Score: ${gameState.score} - Game Over!`;
-                    drawPong(canvas, ctx);
-                    return;
-                }
-
-                drawPong(canvas, ctx);
-                document.getElementById('gameScore').textContent = `Score: ${gameState.score}`;
-
-                animationId = requestAnimationFrame(() => playPong(canvas, ctx, pauseBtn, resumeBtn, startBtn));
+            function resetVectorBall(directionSign) {
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+                currentBallSpeed = 5.5;
+                let angleOffset = (Math.random() - 0.5) * (Math.PI / 4); 
+                vx = Math.cos(angleOffset) * currentBallSpeed * directionSign;
+                vy = Math.sin(angleOffset) * currentBallSpeed;
             }
 
-            function drawPong(canvas, ctx) {
-                // Draw paddle
-                ctx.fillStyle = '#00ff00';
-                ctx.fillRect(gameState.paddle.x, gameState.paddle.y, gameState.paddle.width, gameState.paddle.height);
+            function loop() {
+                if(!isRunning) return;
+                animationId = requestAnimationFrame(loop);
 
-                // Draw ball
-                ctx.fillStyle = '#ffeb3b';
-                ctx.beginPath();
-                ctx.arc(gameState.ball.x, gameState.ball.y, gameState.ball.radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
+                if((keys['ArrowUp'] || keys['w']) && p1Y > 10) p1Y -= 6.5;
+                if((keys['ArrowDown'] || keys['s']) && p1Y < canvas.height - padH - 10) p1Y += 6.5;
 
-        // Parallax effect
-        let animationIdBg;
-        const bg1 = document.querySelector('.blob-1');
-        const bg2 = document.querySelector('.blob-2');
-        const bg3 = document.querySelector('.blob-3');
-
-        window.addEventListener('mousemove', (e) => {
-            cancelAnimationFrame(animationIdBg);
-            animationIdBg = requestAnimationFrame(() => {
-                const moveX = (e.clientX / window.innerWidth) * 30;
-                const moveY = (e.clientY / window.innerHeight) * 30;
+                let targetTrackDestination = ballY - padH / 2;
+                let deltaMoveTracking = targetTrackDestination - p2Y;
+                let maxMachineInertiaSpeed = 4.8; 
+                p2Y += Math.min(Math.max(deltaMoveTracking, -maxMachineInertiaSpeed), maxMachineInertiaSpeed);
                 
-                if (bg1) bg1.style.transform = `translate(${moveX}px, ${moveY}px) scale(1)`;
-                if (bg2) bg2.style.transform = `translate(${-moveX * 0.5}px, ${-moveY * 0.5}px) scale(1)`;
-                if (bg3) bg3.style.transform = `translate(${moveX * 0.3}px, ${-moveY * 0.3}px) scale(1)`;
-            });
-        });
+                if(p2Y < 10) p2Y = 10; if(p2Y > canvas.height - padH - 10) p2Y = canvas.height - padH - 10;
+
+                ballX += vx; ballY += vy;
+
+                if(ballY - ballRadius < 0) { ballY = ballRadius; vy = -vy; applyScreenShake(2); }
+                if(ballY + ballRadius > canvas.height) { ballY = canvas.height - ballRadius; vy = -vy; applyScreenShake(2); }
+
+                if(vx < 0) {
+                    if(ballX - ballRadius < 40 && ballX - ballRadius > 20 && ballY > p1Y && ballY < p1Y + padH) {
+                        let relativeIntersectPointY = (p1Y + (padH / 2)) - ballY;
+                        let normalizedRelativeIntersectionPointY = (relativeIntersectPointY / (padH / 2));
+                        let bounceAngleRad = normalizedRelativeIntersectionPointY * (Math.PI / 3);
+                        
+                        currentBallSpeed += 0.4; 
+                        vx = Math.cos(bounceAngleRad) * currentBallSpeed;
+                        vy = -Math.sin(bounceAngleRad) * currentBallSpeed;
+                        
+                        createExplosion(40, ballY, '#00ffcc', 12);
+                        applyScreenShake(5);
+                    }
+                } else {
+                    if(ballX + ballRadius > canvas.width - 40 && ballX + ballRadius < canvas.width - 20 && ballY > p2Y && ballY < p2Y + padH) {
+                        let relativeIntersectPointY = (p2Y + (padH / 2)) - ballY;
+                        let normalizedRelativeIntersectionPointY = (relativeIntersectPointY / (padH / 2));
+                        let bounceAngleRad = normalizedRelativeIntersectionPointY * (Math.PI / 3);
+                        
+                        currentBallSpeed += 0.4;
+                        vx = -Math.cos(bounceAngleRad) * currentBallSpeed;
+                        vy = -Math.sin(bounceAngleRad) * currentBallSpeed;
+                        
+                        createExplosion(canvas.width - 40, ballY, '#0099ff', 12);
+                        applyScreenShake(5);
+                    }
+                }
+
+                if(ballX < 0) { p2Score++; updateTelemetryText(); createExplosion(20, ballY, '#ff0055', 25); applyScreenShake(15); verifyScoreLimit(1); }
+                else if(ballX > canvas.width) { p1Score++; updateTelemetryText(); createExplosion(canvas.width-20, ballY, '#00ffcc', 25); applyScreenShake(15); verifyScoreLimit(-1); }
+
+                render();
+            }
+
+            function updateTelemetryText() {
+                document.getElementById('gameScore').textContent = `${String(p1Score).padStart(2,'0')} - ${String(p2Score).padStart(2,'0')}`;
+            }
+
+            function verifyScoreLimit(signDir) {
+                if(p1Score >= 5 || p2Score >= 5) {
+                    isRunning = false;
+                    document.getElementById('startBtn').classList.remove('hidden');
+                    document.getElementById('startBtn').textContent = "CYCLE NET ENGINE MODULE";
+                } else {
+                    resetVectorBall(signDir);
+                }
+            }
+
+            function render() {
+                preRenderFrame();
+
+                ctx.save();
+                ctx.shadowBlur = 15;
+                
+                ctx.fillStyle = "#00ffcc"; ctx.shadowColor = "#00ffcc";
+                ctx.fillRect(25, p1Y, padW, padH);
+
+                ctx.fillStyle = "#0099ff"; ctx.shadowColor = "#0099ff";
+                ctx.fillRect(canvas.width - 25 - padW, p2Y, padW, padH);
+
+                ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 2; ctx.setLineDash([10, 10]);
+                ctx.beginPath(); ctx.moveTo(canvas.width/2, 0); ctx.lineTo(canvas.width/2, canvas.height); ctx.stroke();
+                ctx.setLineDash([]); 
+
+                ctx.fillStyle = "#fff"; ctx.shadowColor = "#fff"; ctx.shadowBlur = 20;
+                ctx.beginPath(); ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
+
+                if(!isRunning) {
+                    ctx.fillStyle = p1Score >= 5 ? "#00ffcc" : "#ff0055";
+                    ctx.font = "bold 40px 'Orbitron'"; ctx.textAlign = "center";
+                    ctx.fillText(p1Score >= 5 ? "USER MODULE TRIUMPH" : "PROCESSOR TERMINATION FAILURE", canvas.width/2, canvas.height/2);
+                }
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
+        }
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlitchHub - Cool Stuff</title>
+    <title>GlitchHub - Free Games</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -13,6 +13,16 @@
             font-family: 'Outfit', sans-serif;
         }
         
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a0033 25%, #0a0033 50%, #0f0f1e 75%, #000000 100%);
+            background-attachment: fixed;
+        }
+        
+        /* Glitch Effect */
         .glitch {
             position: relative;
             color: #00ff00;
@@ -64,68 +74,74 @@
                 transform: translate(0);
             }
         }
-        
-        .hero-gradient {
-            background: linear-gradient(135deg, #0f0f23 0%, #1a0033 25%, #0a0033 50%, #0f0f23 75%, #000000 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .animated-bg {
+
+        /* Animated gradient blob */
+        .blob {
             position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.6;
+            mix-blend-mode: screen;
+        }
+
+        .blob-1 {
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(0, 255, 0, 0.3) 0%, transparent 70%);
             top: 10%;
             right: 10%;
+            animation: blob-move-1 8s ease-in-out infinite;
         }
-        
-        .animated-bg-2 {
-            position: absolute;
+
+        .blob-2 {
             width: 300px;
             height: 300px;
-            background: radial-gradient(circle, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: float-reverse 8s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.2) 0%, transparent 70%);
             bottom: 20%;
             left: 5%;
+            animation: blob-move-2 10s ease-in-out infinite;
         }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, -30px); }
+
+        .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(0, 150, 255, 0.2) 0%, transparent 70%);
+            bottom: 10%;
+            right: 5%;
+            animation: blob-move-3 12s ease-in-out infinite;
         }
-        
-        @keyframes float-reverse {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-30px, 30px); }
+
+        @keyframes blob-move-1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 50px) scale(0.9); }
         }
-        
-        .neon-box {
-            background: rgba(0, 255, 0, 0.05);
-            border: 2px solid rgba(0, 255, 0, 0.3);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2), inset 0 0 20px rgba(0, 255, 0, 0.05);
-            transition: all 0.3s ease;
+
+        @keyframes blob-move-2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-50px, 50px) scale(0.9); }
+            66% { transform: translate(50px, -30px) scale(1.1); }
         }
-        
-        .neon-box:hover {
-            background: rgba(0, 255, 0, 0.1);
-            border-color: rgba(0, 255, 0, 0.6);
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4), inset 0 0 20px rgba(0, 255, 0, 0.1);
-            transform: translateY(-5px);
+
+        @keyframes blob-move-3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, 50px) scale(1.05); }
+            66% { transform: translate(-50px, -30px) scale(0.95); }
         }
-        
+
+        /* CTA Button */
         .cta-button {
             background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
             color: #000;
             font-weight: 700;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
         }
-        
+
         .cta-button::before {
             content: '';
             position: absolute;
@@ -133,251 +149,381 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: left 0.3s ease;
+            background: rgba(255, 255, 255, 0.4);
+            transition: left 0.4s ease;
         }
-        
+
         .cta-button:hover::before {
             left: 100%;
         }
-        
+
         .cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.6), 0 15px 35px rgba(0, 255, 0, 0.3);
+            letter-spacing: 0.5px;
         }
-        
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 255, 0, 0.1);
-            border: 2px solid rgba(0, 255, 0, 0.3);
-            border-radius: 12px;
-            font-size: 24px;
-            color: #00ff00;
-            transition: all 0.3s ease;
+
+        .cta-button:active {
+            transform: scale(0.98);
         }
-        
-        .feature-card:hover .feature-icon {
-            background: rgba(0, 255, 0, 0.2);
-            border-color: rgba(0, 255, 0, 0.6);
-            transform: rotate(10deg) scale(1.1);
-        }
-        
+
+        /* Pulse Text */
         .pulse-text {
             animation: pulse-glow 2s ease-in-out infinite;
         }
-        
+
         @keyframes pulse-glow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+            50% { opacity: 0.6; text-shadow: 0 0 20px rgba(0, 255, 0, 0.8); }
+        }
+
+        /* Fade In Up */
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+        }
+
+        /* Game Card */
+        .game-card {
+            background: rgba(0, 255, 0, 0.03);
+            border: 1.5px solid rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.15), inset 0 0 20px rgba(0, 255, 0, 0.02);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .game-card:hover::before {
+            left: 100%;
+        }
+
+        .game-card:hover {
+            background: rgba(0, 255, 0, 0.08);
+            border-color: rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.3), inset 0 0 30px rgba(0, 255, 0, 0.05);
+            transform: translateY(-15px) scale(1.05);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            color: #00ff00;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.2) rotate(10deg);
+            text-shadow: 0 0 40px rgba(0, 255, 0, 0.6);
+        }
+
+        /* Secondary Button */
+        .secondary-button {
+            background: rgba(0, 255, 0, 0.08);
+            border: 2px solid rgba(0, 255, 0, 0.4);
+            color: #00ff00;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .secondary-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 255, 0, 0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .secondary-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .secondary-button:hover {
+            border-color: rgba(0, 255, 0, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+        }
+
+        /* Navigation */
+        nav {
+            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+        }
+
+        nav a {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: #00ff00;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
+        }
+
+        /* Hide games section initially */
+        .games-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .games-section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Back button */
+        .back-button {
+            position: fixed;
+            top: 80px;
+            left: 30px;
+            z-index: 40;
+            display: none;
+        }
+
+        .back-button.show {
+            display: block;
         }
     </style>
 </head>
-<body class="bg-black text-white overflow-x-hidden">
+<body class="text-white overflow-x-hidden">
     <!-- Navigation -->
-    <nav class="fixed w-full top-0 z-50 bg-black/80 backdrop-blur-md border-b border-green-500/20">
+    <nav class="fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="text-2xl font-bold glitch" style="animation: none;">
-                <i class="fas fa-bolt"></i> GlitchHub
+            <div class="text-2xl font-black glitch" style="animation: none; letter-spacing: 2px;">
+                <i class="fas fa-bolt"></i> GLITCH
             </div>
             <div class="hidden md:flex gap-8 items-center">
-                <a href="#features" class="hover:text-green-400 transition">Features</a>
-                <a href="#about" class="hover:text-green-400 transition">About</a>
-                <a href="#contact" class="hover:text-green-400 transition">Contact</a>
-                <button class="cta-button px-6 py-2 rounded-lg">Get Started</button>
+                <a href="#" onclick="goHome()" class="text-sm font-medium uppercase tracking-wider hover:text-green-400">Home</a>
             </div>
-            <button class="md:hidden text-green-400">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient min-h-screen flex items-center justify-center relative pt-20">
-        <div class="animated-bg"></div>
-        <div class="animated-bg-2"></div>
+    <!-- Back Button -->
+    <button class="back-button md:hidden text-green-400 text-2xl" id="backBtn" onclick="goHome()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- Hero Section (Home) -->
+    <section id="home-section" class="min-h-screen flex items-center justify-center relative pt-20 overflow-hidden">
+        <!-- Animated Blobs -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
         
-        <div class="relative z-10 text-center px-6 max-w-4xl">
-            <h1 class="text-6xl md:text-7xl font-black mb-6 leading-tight">
-                Welcome to <span class="glitch">GlitchHub</span>
+        <div class="relative z-10 text-center px-6 max-w-5xl fade-in-up">
+            <h1 class="text-7xl md:text-8xl font-black mb-6 leading-tight">
+                Welcome to<br>
+                <span class="glitch">GLITCH</span>
             </h1>
-            <p class="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed">
-                Experience the next generation of <span class="text-green-400 font-semibold">cool stuff</span>. 
-                Where innovation meets creativity.
+
+            <p class="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
+                Explore a world of free games and entertainment. No paywalls, no ads, just pure fun.
             </p>
             
-            <div class="flex flex-col md:flex-row gap-6 justify-center">
-                <button class="cta-button px-10 py-4 rounded-lg text-lg">
-                    <i class="fas fa-rocket mr-2"></i> Launch Now
-                </button>
-                <button class="px-10 py-4 rounded-lg text-lg border-2 border-green-400 hover:bg-green-400/10 transition">
-                    <i class="fas fa-book mr-2"></i> Learn More
-                </button>
-            </div>
-        </div>
+            <button class="cta-button px-12 py-5 rounded-lg text-2xl uppercase font-bold tracking-wider" onclick="enterGames()">
+                <i class="fas fa-rocket mr-3"></i> Launch
+            </button>
 
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 pulse-text">
-            <i class="fas fa-chevron-down text-2xl text-green-400"></i>
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 pulse-text">
+                <i class="fas fa-chevron-down text-3xl text-green-400"></i>
+            </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 px-6 bg-black/50 relative">
+    <!-- Games Section -->
+    <section id="games-section" class="games-section min-h-screen py-32 px-6">
         <div class="max-w-6xl mx-auto">
-            <h2 class="text-5xl font-black mb-16 text-center">
-                Why Choose <span class="text-green-400">GlitchHub</span>?
-            </h2>
-            
+            <div class="text-center mb-20">
+                <h2 class="text-6xl md:text-7xl font-black mb-6">
+                    Choose Your <span class="text-green-400">Game</span>
+                </h2>
+                <div class="divider my-8"></div>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Pick from our collection of free games and start playing instantly
+                </p>
+            </div>
+
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="feature-card neon-box p-8 rounded-xl">
-                    <div class="feature-icon mb-6">
-                        <i class="fas fa-lightning-bolt"></i>
+                <!-- Game 1 -->
+                <a href="#" class="game-card p-8 rounded-2xl text-center group">
+                    <div class="game-icon">
+                        <i class="fas fa-dice"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Lightning Fast</h3>
-                    <p class="text-gray-300">
-                        Built for speed. Experience ultra-responsive performance that keeps up with your creativity.
-                    </p>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="feature-card neon-box p-8 rounded-xl">
-                    <div class="feature-icon mb-6">
-                        <i class="fas fa-shield-alt"></i>
+                    <h3 class="text-3xl font-bold mb-3">Dice Game</h3>
+                    <p class="text-gray-300 mb-6">Roll the dice and test your luck. Simple, addictive, endless fun.</p>
+                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
+                        Play Now
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Secure & Reliable</h3>
-                    <p class="text-gray-300">
-                        Enterprise-grade security with 99.9% uptime. Your data is safe with us.
-                    </p>
-                </div>
+                </a>
 
-                <!-- Feature 3 -->
-                <div class="feature-card neon-box p-8 rounded-xl">
-                    <div class="feature-icon mb-6">
-                        <i class="fas fa-users"></i>
+                <!-- Game 2 -->
+                <a href="#" class="game-card p-8 rounded-2xl text-center group">
+                    <div class="game-icon">
+                        <i class="fas fa-chess"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Community Driven</h3>
-                    <p class="text-gray-300">
-                        Join thousands of creators. Collaborate, share, and build together.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
+                    <h3 class="text-3xl font-bold mb-3">Memory Match</h3>
+                    <p class="text-gray-300 mb-6">Test your memory by matching tiles. Challenge yourself to beat your record.</p>
+                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
+                        Play Now
+                    </div>
+                </a>
 
-    <!-- Stats Section -->
-    <section class="py-20 px-6 bg-gradient-to-b from-black/50 to-black">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div class="neon-box p-8 rounded-xl text-center">
-                    <h3 class="text-4xl font-black text-green-400 mb-2">10K+</h3>
-                    <p class="text-gray-300">Active Users</p>
-                </div>
-                <div class="neon-box p-8 rounded-xl text-center">
-                    <h3 class="text-4xl font-black text-green-400 mb-2">50+</h3>
-                    <p class="text-gray-300">Features</p>
-                </div>
-                <div class="neon-box p-8 rounded-xl text-center">
-                    <h3 class="text-4xl font-black text-green-400 mb-2">99.9%</h3>
-                    <p class="text-gray-300">Uptime</p>
-                </div>
-                <div class="neon-box p-8 rounded-xl text-center">
-                    <h3 class="text-4xl font-black text-green-400 mb-2">24/7</h3>
-                    <p class="text-gray-300">Support</p>
-                </div>
-            </div>
-        </div>
-    </section>
+                <!-- Game 3 -->
+                <a href="#" class="game-card p-8 rounded-2xl text-center group">
+                    <div class="game-icon">
+                        <i class="fas fa-snake"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-3">Snake</h3>
+                    <p class="text-gray-300 mb-6">The classic arcade game. Navigate and grow while avoiding walls.</p>
+                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
+                        Play Now
+                    </div>
+                </a>
 
-    <!-- Call to Action Section -->
-    <section id="contact" class="py-20 px-6 relative">
-        <div class="max-w-4xl mx-auto text-center neon-box p-12 rounded-2xl">
-            <h2 class="text-5xl font-black mb-6">Ready to Get Started?</h2>
-            <p class="text-xl text-gray-300 mb-8">
-                Join the GlitchHub community today and unlock your potential.
-            </p>
-            <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <button class="cta-button px-10 py-4 rounded-lg text-lg">
-                    Start for Free
-                </button>
-                <button class="px-10 py-4 rounded-lg text-lg border-2 border-green-400 hover:bg-green-400/10 transition">
-                    Schedule Demo
-                </button>
+                <!-- Game 4 -->
+                <a href="#" class="game-card p-8 rounded-2xl text-center group">
+                    <div class="game-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-3">Star Clicker</h3>
+                    <p class="text-gray-300 mb-6">Click stars as fast as you can. How many can you collect?</p>
+                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
+                        Play Now
+                    </div>
+                </a>
+
+                <!-- Game 5 -->
+                <a href="#" class="game-card p-8 rounded-2xl text-center group">
+                    <div class="game-icon">
+                        <i class="fas fa-bomb"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-3">Minesweeper</h3>
+                    <p class="text-gray-300 mb-6">The timeless puzzle game. Use your logic to find safe squares.</p>
+                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
+                        Play Now
+                    </div>
+                </a>
+
+                <!-- Game 6 -->
+                <a href="#" class="game-card p-8 rounded-2xl text-center group">
+                    <div class="game-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-3">Flappy Bird</h3>
+                    <p class="text-gray-300 mb-6">Navigate through obstacles. One tap to fly, timing is everything.</p>
+                    <div class="secondary-button px-8 py-3 rounded-lg text-center inline-block relative z-20">
+                        Play Now
+                    </div>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 px-6 border-t border-green-500/20 bg-black/80">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8 mb-12">
-                <div>
-                    <h4 class="font-bold mb-4 text-green-400">Product</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-green-400 transition">Features</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Pricing</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Security</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4 text-green-400">Company</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-green-400 transition">About</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Blog</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Careers</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4 text-green-400">Resources</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-green-400 transition">Docs</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">API</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Support</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold mb-4 text-green-400">Follow</h4>
-                    <div class="flex gap-4 text-gray-400">
-                        <a href="#" class="hover:text-green-400 transition text-2xl"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="hover:text-green-400 transition text-2xl"><i class="fab fa-github"></i></a>
-                        <a href="#" class="hover:text-green-400 transition text-2xl"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t border-green-500/20 pt-8 text-center text-gray-400">
-                <p>&copy; 2026 GlitchHub. All rights reserved. Built with <span class="text-red-500">❤</span> for creators.</p>
-            </div>
+    <footer class="py-16 px-6 border-t border-green-500/20 bg-black/40">
+        <div class="max-w-6xl mx-auto text-center text-gray-400">
+            <p>&copy; 2026 GlitchHub. All rights reserved. Built with <span class="text-red-500 text-lg">❤</span> for gamers.</p>
         </div>
     </footer>
 
     <script>
+        // Navigation functions
+        function enterGames() {
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('games-section').classList.add('active');
+            document.getElementById('backBtn').classList.add('show');
+            window.scrollTo(0, 0);
+        }
+
+        function goHome() {
+            document.getElementById('home-section').style.display = 'flex';
+            document.getElementById('games-section').classList.remove('active');
+            document.getElementById('backBtn').classList.remove('show');
+            window.scrollTo(0, 0);
+        }
+
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
             });
         });
 
-        // Add parallax effect to animated backgrounds
+        // Parallax effect with improved performance
+        let animationId;
+        const bg1 = document.querySelector('.blob-1');
+        const bg2 = document.querySelector('.blob-2');
+        const bg3 = document.querySelector('.blob-3');
+
         window.addEventListener('mousemove', (e) => {
-            const bg = document.querySelector('.animated-bg');
-            const bg2 = document.querySelector('.animated-bg-2');
-            const moveX = (e.clientX / window.innerWidth) * 50;
-            const moveY = (e.clientY / window.innerHeight) * 50;
-            
-            if (bg && bg2) {
-                bg.style.transform = `translate(${moveX}px, ${moveY}px)`;
-                bg2.style.transform = `translate(${-moveX * 0.5}px, ${-moveY * 0.5}px)`;
-            }
+            cancelAnimationFrame(animationId);
+            animationId = requestAnimationFrame(() => {
+                const moveX = (e.clientX / window.innerWidth) * 30;
+                const moveY = (e.clientY / window.innerHeight) * 30;
+                
+                if (bg1) bg1.style.transform = `translate(${moveX}px, ${moveY}px) scale(1)`;
+                if (bg2) bg2.style.transform = `translate(${-moveX * 0.5}px, ${-moveY * 0.5}px) scale(1)`;
+                if (bg3) bg3.style.transform = `translate(${moveX * 0.3}px, ${-moveY * 0.3}px) scale(1)`;
+            });
+        });
+
+        // Prevent link navigation for game cards
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                return false;
+            });
         });
     </script>
 </body>

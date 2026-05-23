@@ -152,6 +152,35 @@
             border: 2px solid #ff0055;
             box-shadow: 0 0 40px rgba(255, 0, 85, 0.15);
         }
+
+        .mode-selector {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .mode-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            color: #00ffcc;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+
+        .mode-button.active {
+            background: #00ffcc;
+            color: #000;
+        }
+
+        .mode-button:hover {
+            border-color: #00ffcc;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+        }
     </style>
 </head>
 <body class="text-white min-h-screen relative">
@@ -198,11 +227,11 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- OG Super Mario Bros - Large Card -->
-                <div onclick="startGame('smb')" class="game-card game-card-large p-12 rounded-2xl cursor-pointer group flex flex-col justify-between bg-gradient-to-br from-orange-950/50 to-red-950/50 border-2 border-red-400/40 hover:border-red-400/80 transform hover:scale-102">
+                <div onclick="startGame('smb')" class="game-card game-card-large p-12 rounded-2xl cursor-pointer group flex flex-col justify-between bg-gradient-to-br from-orange-950/50 to-red-950/50">
                     <div>
                         <div class="text-6xl mb-6 game-icon"><i class="fas fa-gamepad"></i></div>
                         <h3 class="text-4xl font-black font-display mb-4 text-red-400 uppercase tracking-wider">OG Super Mario Bros</h3>
-                        <p class="text-gray-300 text-base leading-relaxed font-light">The legendary NES classic. Jump through pipes, stomp on Goombas, and save Princess Peach. Pure retro gaming excellence in an emulated NES core module.</p>
+                        <p class="text-gray-300 text-base leading-relaxed font-light">The legendary NES classic. Jump through pipes, stomp on Goombas, and save Princess Peach. Pure retro gaming excellence.</p>
                     </div>
                     <div class="mt-8 font-display text-sm tracking-wider text-red-400 uppercase group-hover:underline">Activate Legacy Protocol &rarr;</div>
                 </div>
@@ -212,7 +241,7 @@
                     <div>
                         <div class="text-4xl mb-4 game-icon"><i class="fas fa-scroll"></i></div>
                         <h3 class="text-2xl font-black font-display mb-2 text-cyan-400">NEON SNAKE</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Polished vector movement array with trailing graphics, dynamic physics acceleration speed curves, and precise grid layout collisions.</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Polished vector movement array with trailing graphics, dynamic physics acceleration speed curves, and precise grid layout collision.</p>
                     </div>
                     <div class="mt-6 font-display text-xs tracking-wider text-cyan-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
                 </div>
@@ -224,6 +253,42 @@
                         <p class="text-gray-400 text-sm leading-relaxed">Fluid card flip transforms, item tracking indexes, visual particle splash bursts, and combo performance metrics.</p>
                     </div>
                     <div class="mt-6 font-display text-xs tracking-wider text-pink-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
+
+                <div onclick="startGame('pong')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-table-tennis"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-blue-400">PONG PROTOCOLS</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Classic paddle-based kinetic collision system. Solo vs AI or dual operator multiplayer mode. Trajectory physics enabled.</p>
+                    </div>
+                    <div class="mt-6 font-display text-xs tracking-wider text-blue-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
+
+                <div onclick="startGame('tetris')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-cubes"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-purple-400">TETROMINO STACK</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Rotating block arrays with dynamic gravity simulation. Line completion protocol with cascade scoring and difficulty escalation.</p>
+                    </div>
+                    <div class="mt-6 font-display text-xs tracking-wider text-purple-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
+
+                <div onclick="startGame('minesweeper')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-bomb"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-yellow-400">MINEFIELD SCAN</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Cellular grid analysis with proximity detection algorithm. Flag placement and safe zone expansion protocols.</p>
+                    </div>
+                    <div class="mt-6 font-display text-xs tracking-wider text-yellow-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
+                </div>
+
+                <div onclick="startGame('breakout')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-bricks"></i></div>
+                        <h3 class="text-2xl font-black font-display mb-2 text-orange-400">BRICK BREAKER MATRIX</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Paddle control systems with elastic ball physics and destructible block cascades. Multi-hit block degradation.</p>
+                    </div>
+                    <div class="mt-6 font-display text-xs tracking-wider text-orange-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
                 </div>
             </div>
         </div>
@@ -243,13 +308,19 @@
                 </div>
             </div>
 
+            <!-- Mode Selector for Pong -->
+            <div id="modeSelector" class="mode-selector hidden">
+                <button class="mode-button active" onclick="setPongMode('ai')">VS AI</button>
+                <button class="mode-button" onclick="setPongMode('2player')">2 PLAYER</button>
+            </div>
+
             <div class="relative overflow-hidden rounded-xl bg-black flex justify-center items-center min-h-96" id="gameCanvasContainer">
                 <canvas id="gameCanvas" width="800" height="450" class="max-w-full h-auto" style="display: none;"></canvas>
                 <div id="emuContainer" style="display: none;"></div>
             </div>
 
             <div class="flex flex-wrap justify-center gap-4 mt-6">
-                <button id="startBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-black font-display tracking-widest px-8 py-3 rounded-xl transition uppercase text-sm" onclick="triggerGameStart()">INITIALIZE INSTANCE</button>
+                <button id="startBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-black font-display tracking-widest px-8 py-3 rounded-xl transition text-sm uppercase" onclick="triggerGameStart()">INITIALIZE INSTANCE</button>
                 <button id="actionBtn" class="bg-white/10 hover:bg-white/20 text-white font-black font-display tracking-widest px-6 py-3 rounded-xl transition text-sm uppercase hidden" onclick="triggerGameAction()">ACTION</button>
                 <button class="bg-rose-950/40 hover:bg-rose-900/50 text-rose-400 font-bold border border-rose-500/20 px-6 py-3 rounded-xl transition text-sm tracking-wide" onclick="goHome()">KILL PROCESS</button>
             </div>
@@ -266,6 +337,7 @@
         let animationId = null;
         let canvas, ctx;
         let keys = {};
+        let pongMode = 'ai';
 
         // Screen Shake Framework
         let shakeIntensity = 0;
@@ -317,28 +389,30 @@
             document.getElementById('games-section').classList.add('active');
         }
 
+        function setPongMode(mode) {
+            pongMode = mode;
+            document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
         // ==========================================
         // DEEP INSTANCE KILL ROUTINE (ABORT & PURGE)
         // ==========================================
         function goHome() {
-            // 1. Immediately kill standard requestAnimationFrame loops
             if (animationId) {
                 cancelAnimationFrame(animationId);
                 animationId = null;
             }
             
-            // 2. Erase the emulator container structure to kill internal iframe/canvas contexts
             const emuContainer = document.getElementById('emuContainer');
             if (emuContainer) {
                 emuContainer.innerHTML = '';
                 emuContainer.style.display = 'none';
             }
             
-            // 3. Rip down runtime loader scripts to block dynamic assets from finishing downloads
             const oldScript = document.getElementById('emu-loader-script');
             if (oldScript) oldScript.remove();
             
-            // 4. Force global emulator window objects out of existence to stop audio buffers & events
             delete window.EJS_player;
             delete window.EJS_core;
             delete window.EJS_gameUrl;
@@ -346,7 +420,6 @@
             delete window.EJS_pathtodata;
             delete window.EJS_color;
             
-            // Unbind key/pointer handlers from specific arcade setups
             if (canvas) {
                 canvas.onclick = null;
                 canvas.style.display = 'none';
@@ -354,7 +427,6 @@
             ctx = null;
             currentGame = null;
 
-            // 5. Restore core structural layout display styles
             document.getElementById('home-section').style.display = 'flex';
             document.getElementById('games-section').classList.remove('active');
             document.getElementById('game-container').classList.remove('active');
@@ -412,6 +484,7 @@
             const actionBtn = document.getElementById('actionBtn');
             const title = document.getElementById('gameTitle');
             const instructions = document.getElementById('gameInstructions');
+            const modeSelector = document.getElementById('modeSelector');
             
             if (animationId) cancelAnimationFrame(animationId);
             actionBtn.classList.add('hidden');
@@ -422,6 +495,8 @@
             if(name !== 'smb') {
                 canvas.onclick = null;
             }
+
+            modeSelector.classList.add('hidden');
 
             switch(name) {
                 case 'smb':
@@ -438,6 +513,27 @@
                     title.textContent = "Matrix Match Matrix";
                     instructions.textContent = "Input Target Pointer: Click tiles to decode duplicate encrypted memory nodes.";
                     setupMemory();
+                    break;
+                case 'pong':
+                    title.textContent = "Pong Protocols";
+                    instructions.textContent = pongMode === 'ai' ? "Arrow Up/Down or W/S: Move Paddle. Objective: Bounce ball past opponent." : "P1: W/S Keys | P2: Arrow Up/Down. Bounce ball past opponent.";
+                    modeSelector.classList.remove('hidden');
+                    setupPong();
+                    break;
+                case 'tetris':
+                    title.textContent = "Tetromino Stack System";
+                    instructions.textContent = "Arrow Keys: Move. Space: Rotate. Down: Accelerate. Complete lines to score.";
+                    setupTetris();
+                    break;
+                case 'minesweeper':
+                    title.textContent = "Minefield Scan Protocol";
+                    instructions.textContent = "Left Click: Reveal. Right Click: Flag. Avoid mines, clear the grid.";
+                    setupMinesweeper();
+                    break;
+                case 'breakout':
+                    title.textContent = "Brick Breaker Matrix";
+                    instructions.textContent = "Arrow Keys or Mouse: Move Paddle. Bounce ball to destroy bricks.";
+                    setupBrickBreaker();
                     break;
             }
         }
@@ -464,7 +560,6 @@
                     emuContainer.style.display = 'block';
                     emuContainer.innerHTML = '';
 
-                    // Define Target Layout Configuration Properties
                     window.EJS_player = '#emuContainer';
                     window.EJS_core = "nes";
                     window.EJS_color = "#000000";
@@ -472,7 +567,6 @@
                     window.EJS_pathtodata = "https://cdn.jsdelivr.net/gh/a456pur/seraph@81f551ca0aa8e3d6018d32d8ac5904ac9bc78f76/storage/emulatorjs/data";
                     window.EJS_gameUrl = "https://cdn.jsdelivr.net/gh/bubbls/UGS-file-encryption@e0c78a58432c6486ebe1a50a78d263df65809a83/Super%20Mario%20Bros.%20(Europe).zip";
 
-                    // Inject Compiled Web Loader runtime scripts
                     const script = document.createElement('script');
                     script.src = "https://cdn.jsdelivr.net/gh/a456pur/seraph@81f551ca0aa8e3d6018d32d8ac5904ac9bc78f76/storage/emulatorjs/data/loader.js";
                     script.id = "emu-loader-script";
@@ -720,7 +814,6 @@
                         ctx.fillRect(card.x, card.y, w, h);
                         ctx.strokeRect(card.x, card.y, w, h);
                         
-                        // Cyber Cross decoration lines
                         ctx.strokeStyle = "rgba(255, 0, 85, 0.2)";
                         ctx.beginPath(); ctx.moveTo(card.x + 10, card.y + 10); ctx.lineTo(card.x + w - 10, card.y + h - 10); ctx.stroke();
                         ctx.beginPath(); ctx.moveTo(card.x + w - 10, card.y + 10); ctx.lineTo(card.x + 10, card.y + h - 10); ctx.stroke();
@@ -734,6 +827,644 @@
                     ctx.textAlign = "center";
                     ctx.fillText("MATRIX INTEGRITY RECONSTRUCTED", canvas.width/2, canvas.height/2);
                 }
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
+        }
+
+        // ==========================================
+        // 3. PONG PROTOCOLS ENGINE
+        // ==========================================
+        function setupPong() {
+            let paddle1, paddle2, ball, score1, score2, isRunning;
+            const paddleW = 12, paddleH = 80;
+            const ballSize = 6;
+
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+
+                    paddle1 = { x: 20, y: canvas.height/2 - paddleH/2, width: paddleW, height: paddleH, dy: 0 };
+                    paddle2 = { x: canvas.width - 20 - paddleW, y: canvas.height/2 - paddleH/2, width: paddleW, height: paddleH, dy: 0 };
+                    ball = { x: canvas.width/2, y: canvas.height/2, vx: 5, vy: 5, size: ballSize };
+                    score1 = 0; score2 = 0;
+                    isRunning = true;
+                    document.getElementById('startBtn').classList.add('hidden');
+                    loop();
+                }
+            };
+
+            function loop() {
+                if(!isRunning) return;
+                animationId = requestAnimationFrame(loop);
+
+                // Input handling
+                paddle1.dy = 0;
+                paddle2.dy = 0;
+                
+                if(keys['w'] || keys['W']) paddle1.dy = -6;
+                if(keys['s'] || keys['S']) paddle1.dy = 6;
+
+                if(pongMode === '2player') {
+                    if(keys['ArrowUp']) paddle2.dy = -6;
+                    if(keys['ArrowDown']) paddle2.dy = 6;
+                } else {
+                    // AI
+                    if(ball.y < paddle2.y + paddleH/2 - 35) paddle2.dy = -5;
+                    if(ball.y > paddle2.y + paddleH/2 + 35) paddle2.dy = 5;
+                }
+
+                paddle1.y += paddle1.dy;
+                paddle2.y += paddle2.dy;
+                if(paddle1.y < 0) paddle1.y = 0;
+                if(paddle1.y + paddleH > canvas.height) paddle1.y = canvas.height - paddleH;
+                if(paddle2.y < 0) paddle2.y = 0;
+                if(paddle2.y + paddleH > canvas.height) paddle2.y = canvas.height - paddleH;
+
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+
+                if(ball.y - ball.size < 0 || ball.y + ball.size > canvas.height) ball.vy *= -1;
+
+                if(ball.x - ball.size < paddle1.x + paddleW && ball.y > paddle1.y && ball.y < paddle1.y + paddleH) {
+                    ball.vx = Math.abs(ball.vx) + 1;
+                    ball.x = paddle1.x + paddleW + ball.size;
+                    ball.vy += paddle1.dy * 0.3;
+                    applyScreenShake(4);
+                    createExplosion(ball.x, ball.y, '#00ffcc', 10);
+                }
+
+                if(ball.x + ball.size > paddle2.x && ball.y > paddle2.y && ball.y < paddle2.y + paddleH) {
+                    ball.vx = -Math.abs(ball.vx) - 1;
+                    ball.x = paddle2.x - ball.size;
+                    ball.vy += paddle2.dy * 0.3;
+                    applyScreenShake(4);
+                    createExplosion(ball.x, ball.y, '#0099ff', 10);
+                }
+
+                if(ball.x < -10) {
+                    score2++;
+                    document.getElementById('gameScore').textContent = String(score2).padStart(5, '0');
+                    ball = { x: canvas.width/2, y: canvas.height/2, vx: 5, vy: 5, size: ballSize };
+                }
+                if(ball.x > canvas.width + 10) {
+                    score1++;
+                    document.getElementById('gameScore').textContent = String(score1).padStart(5, '0');
+                    ball = { x: canvas.width/2, y: canvas.height/2, vx: -5, vy: 5, size: ballSize };
+                }
+
+                render();
+            }
+
+            function render() {
+                preRenderFrame();
+
+                ctx.fillStyle = "#00ffcc";
+                ctx.shadowColor = "#00ffcc";
+                ctx.shadowBlur = 10;
+                ctx.fillRect(paddle1.x, paddle1.y, paddleW, paddleH);
+
+                ctx.fillStyle = "#0099ff";
+                ctx.shadowColor = "#0099ff";
+                ctx.shadowBlur = 10;
+                ctx.fillRect(paddle2.x, paddle2.y, paddleW, paddleH);
+
+                ctx.fillStyle = "#ffff00";
+                ctx.shadowColor = "#ffff00";
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ballSize, 0, Math.PI*2);
+                ctx.fill();
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
+        }
+
+        // ==========================================
+        // 4. TETRIS PROTOCOLS ENGINE
+        // ==========================================
+        function setupTetris() {
+            let grid, currentPiece, nextPiece, score, isRunning, dropCounter, dropSpeed;
+            const gridW = 10, gridH = 20, cellSize = canvas.width / gridW;
+            const tetriminos = [
+                [[1,1,1,1]], // I
+                [[1,1],[1,1]], // O
+                [[0,1,0],[1,1,1]], // T
+                [[1,0,0],[1,1,1]], // L
+                [[0,0,1],[1,1,1]], // J
+                [[0,1,1],[1,1,0]], // S
+                [[1,1,0],[0,1,1]] // Z
+            ];
+            const colors = ['#00ffcc', '#ff0055', '#0099ff', '#ffff00', '#ff00ff', '#00ff00', '#ff8800'];
+
+            function initGrid() {
+                grid = [];
+                for(let i = 0; i < gridH; i++) {
+                    grid[i] = [];
+                    for(let j = 0; j < gridW; j++) {
+                        grid[i][j] = 0;
+                    }
+                }
+            }
+
+            function getNewPiece() {
+                let idx = Math.floor(Math.random() * tetriminos.length);
+                return {
+                    shape: tetriminos[idx],
+                    color: colors[idx],
+                    x: Math.floor(gridW / 2) - 1,
+                    y: 0
+                };
+            }
+
+            function canPlace(piece, x, y) {
+                for(let i = 0; i < piece.shape.length; i++) {
+                    for(let j = 0; j < piece.shape[i].length; j++) {
+                        if(piece.shape[i][j]) {
+                            let nx = x + j, ny = y + i;
+                            if(nx < 0 || nx >= gridW || ny >= gridH) return false;
+                            if(ny >= 0 && grid[ny][nx]) return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            function placePiece(piece) {
+                for(let i = 0; i < piece.shape.length; i++) {
+                    for(let j = 0; j < piece.shape[i].length; j++) {
+                        if(piece.shape[i][j]) {
+                            let ny = piece.y + i;
+                            if(ny >= 0) grid[ny][piece.x + j] = piece.color;
+                        }
+                    }
+                }
+            }
+
+            function clearLines() {
+                let cleared = 0;
+                for(let i = gridH - 1; i >= 0; i--) {
+                    if(grid[i].every(cell => cell !== 0)) {
+                        grid.splice(i, 1);
+                        grid.unshift(new Array(gridW).fill(0));
+                        cleared++;
+                        createExplosion(canvas.width/2, i * cellSize, '#00ffcc', 20);
+                    }
+                }
+                return cleared;
+            }
+
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+
+                    initGrid();
+                    currentPiece = getNewPiece();
+                    score = 0;
+                    isRunning = true;
+                    dropCounter = 0;
+                    dropSpeed = 30;
+                    document.getElementById('startBtn').classList.add('hidden');
+                    loop();
+                }
+            };
+
+            function loop() {
+                if(!isRunning) return;
+                animationId = requestAnimationFrame(loop);
+
+                if(keys[' '] || keys['ArrowUp']) {
+                    let rotated = JSON.parse(JSON.stringify(currentPiece));
+                    rotated.shape = rotated.shape[0].map((_, i) => rotated.shape.map(row => row[i])).reverse();
+                    if(canPlace(rotated, rotated.x, rotated.y)) currentPiece = rotated;
+                    keys[' '] = false;
+                    keys['ArrowUp'] = false;
+                }
+
+                if(keys['ArrowLeft'] && canPlace(currentPiece, currentPiece.x - 1, currentPiece.y)) currentPiece.x--;
+                if(keys['ArrowRight'] && canPlace(currentPiece, currentPiece.x + 1, currentPiece.y)) currentPiece.x++;
+
+                dropCounter++;
+                let dropRate = keys['ArrowDown'] ? 2 : dropSpeed;
+                if(dropCounter > dropRate) {
+                    dropCounter = 0;
+                    if(canPlace(currentPiece, currentPiece.x, currentPiece.y + 1)) {
+                        currentPiece.y++;
+                    } else {
+                        placePiece(currentPiece);
+                        let cleared = clearLines();
+                        score += cleared * 100;
+                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        currentPiece = getNewPiece();
+                        if(!canPlace(currentPiece, currentPiece.x, currentPiece.y)) {
+                            isRunning = false;
+                            applyScreenShake(20);
+                            document.getElementById('startBtn').classList.remove('hidden');
+                            document.getElementById('startBtn').textContent = "RESTART TETRIS";
+                        }
+                    }
+                }
+
+                render();
+            }
+
+            function render() {
+                preRenderFrame();
+
+                for(let i = 0; i < gridH; i++) {
+                    for(let j = 0; j < gridW; j++) {
+                        if(grid[i][j]) {
+                            ctx.fillStyle = grid[i][j];
+                            ctx.shadowColor = grid[i][j];
+                            ctx.shadowBlur = 8;
+                            ctx.fillRect(j * cellSize + 1, i * cellSize + 1, cellSize - 2, cellSize - 2);
+                        }
+                    }
+                }
+
+                for(let i = 0; i < currentPiece.shape.length; i++) {
+                    for(let j = 0; j < currentPiece.shape[i].length; j++) {
+                        if(currentPiece.shape[i][j]) {
+                            let x = currentPiece.x + j;
+                            let y = currentPiece.y + i;
+                            ctx.fillStyle = currentPiece.color;
+                            ctx.shadowColor = currentPiece.color;
+                            ctx.shadowBlur = 10;
+                            ctx.fillRect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2);
+                        }
+                    }
+                }
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
+        }
+
+        // ==========================================
+        // 5. MINESWEEPER PROTOCOLS ENGINE
+        // ==========================================
+        function setupMinesweeper() {
+            let grid, revealed, flagged, score, isRunning;
+            const gridW = 10, gridH = 10, cellSize = canvas.width / gridW;
+            const mineCount = 15;
+
+            function initGrid() {
+                grid = [];
+                revealed = [];
+                flagged = [];
+                for(let i = 0; i < gridH; i++) {
+                    grid[i] = [];
+                    revealed[i] = [];
+                    flagged[i] = [];
+                    for(let j = 0; j < gridW; j++) {
+                        grid[i][j] = 0;
+                        revealed[i][j] = false;
+                        flagged[i][j] = false;
+                    }
+                }
+
+                let placed = 0;
+                while(placed < mineCount) {
+                    let x = Math.floor(Math.random() * gridW);
+                    let y = Math.floor(Math.random() * gridH);
+                    if(grid[y][x] !== 'M') {
+                        grid[y][x] = 'M';
+                        placed++;
+                    }
+                }
+
+                for(let i = 0; i < gridH; i++) {
+                    for(let j = 0; j < gridW; j++) {
+                        if(grid[i][j] !== 'M') {
+                            let count = 0;
+                            for(let di = -1; di <= 1; di++) {
+                                for(let dj = -1; dj <= 1; dj++) {
+                                    let ni = i + di, nj = j + dj;
+                                    if(ni >= 0 && ni < gridH && nj >= 0 && nj < gridW && grid[ni][nj] === 'M') count++;
+                                }
+                            }
+                            grid[i][j] = count;
+                        }
+                    }
+                }
+            }
+
+            function revealCell(x, y) {
+                if(x < 0 || x >= gridW || y < 0 || y >= gridH || revealed[y][x] || flagged[y][x]) return;
+                revealed[y][x] = true;
+
+                if(grid[y][x] === 'M') {
+                    gameOver();
+                    return;
+                }
+
+                if(grid[y][x] === 0) {
+                    for(let di = -1; di <= 1; di++) {
+                        for(let dj = -1; dj <= 1; dj++) {
+                            revealCell(x + dj, y + di);
+                        }
+                    }
+                }
+
+                checkWin();
+            }
+
+            function toggleFlag(x, y) {
+                if(!revealed[y][x]) flagged[y][x] = !flagged[y][x];
+            }
+
+            function checkWin() {
+                let allRevealed = true;
+                for(let i = 0; i < gridH && allRevealed; i++) {
+                    for(let j = 0; j < gridW && allRevealed; j++) {
+                        if(grid[i][j] !== 'M' && !revealed[i][j]) allRevealed = false;
+                    }
+                }
+                if(allRevealed) {
+                    score += 500;
+                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                    applyScreenShake(10);
+                    createExplosion(canvas.width/2, canvas.height/2, '#00ffcc', 40);
+                    isRunning = false;
+                    document.getElementById('startBtn').classList.remove('hidden');
+                    document.getElementById('startBtn').textContent = "NEW GAME";
+                }
+            }
+
+            function gameOver() {
+                isRunning = false;
+                applyScreenShake(25);
+                for(let i = 0; i < gridH; i++) {
+                    for(let j = 0; j < gridW; j++) {
+                        if(grid[i][j] === 'M') revealed[i][j] = true;
+                    }
+                }
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('startBtn').textContent = "RESTART GAME";
+            }
+
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+
+                    initGrid();
+                    score = 0;
+                    isRunning = true;
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00000";
+                    canvas.onclick = function(e) {
+                        if(!isRunning) return;
+                        const rect = canvas.getBoundingClientRect();
+                        const x = Math.floor((e.clientX - rect.left) / cellSize);
+                        const y = Math.floor((e.clientY - rect.top) / cellSize);
+                        if(x >= 0 && x < gridW && y >= 0 && y < gridH) {
+                            revealCell(x, y);
+                            createExplosion(e.clientX - rect.left, e.clientY - rect.top, '#0099ff', 8);
+                        }
+                    };
+                    canvas.oncontextmenu = function(e) {
+                        e.preventDefault();
+                        if(!isRunning) return;
+                        const rect = canvas.getBoundingClientRect();
+                        const x = Math.floor((e.clientX - rect.left) / cellSize);
+                        const y = Math.floor((e.clientY - rect.top) / cellSize);
+                        if(x >= 0 && x < gridW && y >= 0 && y < gridH) {
+                            toggleFlag(x, y);
+                        }
+                    };
+                    loop();
+                }
+            };
+
+            function loop() {
+                if(!isRunning && !document.getElementById('startBtn').classList.contains('hidden')) return;
+                animationId = requestAnimationFrame(loop);
+                render();
+            }
+
+            function render() {
+                preRenderFrame();
+
+                for(let i = 0; i < gridH; i++) {
+                    for(let j = 0; j < gridW; j++) {
+                        let x = j * cellSize, y = i * cellSize;
+
+                        if(!revealed[i][j]) {
+                            ctx.fillStyle = "rgba(255, 0, 85, 0.2)";
+                            ctx.strokeStyle = "rgba(255, 0, 85, 0.5)";
+                            ctx.lineWidth = 1;
+                            ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+                            ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+
+                            if(flagged[i][j]) {
+                                ctx.fillStyle = "#ffff00";
+                                ctx.font = "bold 16px Arial";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText("🚩", x + cellSize/2, y + cellSize/2);
+                            }
+                        } else {
+                            ctx.fillStyle = "rgba(0, 255, 204, 0.1)";
+                            ctx.strokeStyle = "rgba(0, 255, 204, 0.3)";
+                            ctx.lineWidth = 1;
+                            ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+                            ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+
+                            if(grid[i][j] === 'M') {
+                                ctx.fillStyle = "#ff0055";
+                                ctx.font = "bold 20px Arial";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText("💣", x + cellSize/2, y + cellSize/2);
+                            } else if(grid[i][j] > 0) {
+                                ctx.fillStyle = "#00ffcc";
+                                ctx.font = "bold 18px Orbitron";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText(grid[i][j], x + cellSize/2, y + cellSize/2);
+                            }
+                        }
+                    }
+                }
+
+                postRenderFrame();
+            }
+
+            preRenderFrame();
+            postRenderFrame();
+        }
+
+        // ==========================================
+        // 6. BRICK BREAKER MATRIX ENGINE
+        // ==========================================
+        function setupBrickBreaker() {
+            let paddle, ball, bricks, score, isRunning;
+            const paddleW = 100, paddleH = 12;
+            const ballSize = 6;
+            const brickRows = 4, brickCols = 8;
+            const brickW = canvas.width / brickCols;
+            const brickH = 20;
+
+            gameInstance = {
+                start: function() {
+                    if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+
+                    paddle = { x: canvas.width/2 - paddleW/2, y: canvas.height - 30, width: paddleW, height: paddleH };
+                    ball = { x: canvas.width/2, y: canvas.height - 50, vx: 4, vy: -4, size: ballSize };
+                    score = 0;
+                    isRunning = true;
+
+                    bricks = [];
+                    const colors = ['#00ffcc', '#ff0055', '#0099ff', '#ffff00'];
+                    for(let i = 0; i < brickRows; i++) {
+                        for(let j = 0; j < brickCols; j++) {
+                            bricks.push({
+                                x: j * brickW, y: i * brickH + 40,
+                                width: brickW, height: brickH,
+                                color: colors[i], health: 1
+                            });
+                        }
+                    }
+
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00000";
+                    
+                    canvas.onmousemove = function(e) {
+                        const rect = canvas.getBoundingClientRect();
+                        paddle.x = (e.clientX - rect.left) - paddleW/2;
+                        if(paddle.x < 0) paddle.x = 0;
+                        if(paddle.x + paddleW > canvas.width) paddle.x = canvas.width - paddleW;
+                    };
+
+                    loop();
+                }
+            };
+
+            function loop() {
+                if(!isRunning) return;
+                animationId = requestAnimationFrame(loop);
+
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+
+                if(ball.x - ballSize < 0 || ball.x + ballSize > canvas.width) ball.vx *= -1;
+                if(ball.y - ballSize < 0) ball.vy *= -1;
+
+                if(ball.y + ballSize > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddleW) {
+                    ball.vy = -Math.abs(ball.vy);
+                    ball.y = paddle.y - ballSize;
+                    ball.vx += (ball.x - (paddle.x + paddleW/2)) * 0.02;
+                    applyScreenShake(4);
+                    createExplosion(ball.x, ball.y, '#00ffcc', 15);
+                }
+
+                if(ball.y > canvas.height) {
+                    applyScreenShake(20);
+                    isRunning = false;
+                    document.getElementById('startBtn').classList.remove('hidden');
+                    document.getElementById('startBtn').textContent = "RETRY GAME";
+                    return;
+                }
+
+                for(let i = bricks.length - 1; i >= 0; i--) {
+                    let brick = bricks[i];
+                    if(ball.x > brick.x && ball.x < brick.x + brick.width &&
+                       ball.y > brick.y && ball.y < brick.y + brick.height) {
+                        
+                        brick.health--;
+                        if(brick.health <= 0) {
+                            bricks.splice(i, 1);
+                            score += 50;
+                            createExplosion(brick.x + brick.width/2, brick.y + brick.height/2, brick.color, 20);
+                        }
+                        
+                        let overlapLeft = ball.x + ballSize - brick.x;
+                        let overlapRight = brick.x + brick.width - (ball.x - ballSize);
+                        let overlapTop = ball.y + ballSize - brick.y;
+                        let overlapBottom = brick.y + brick.height - (ball.y - ballSize);
+
+                        if(overlapLeft < overlapRight && overlapLeft < overlapTop && overlapLeft < overlapBottom) {
+                            ball.vx = -Math.abs(ball.vx);
+                        } else if(overlapRight < overlapLeft && overlapRight < overlapTop && overlapRight < overlapBottom) {
+                            ball.vx = Math.abs(ball.vx);
+                        } else {
+                            ball.vy *= -1;
+                        }
+
+                        applyScreenShake(6);
+                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        
+                        if(bricks.length === 0) {
+                            isRunning = false;
+                            score += 1000;
+                            document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                            applyScreenShake(15);
+                            createExplosion(canvas.width/2, canvas.height/2, '#00ffcc', 50);
+                            document.getElementById('startBtn').classList.remove('hidden');
+                            document.getElementById('startBtn').textContent = "NEW LEVEL";
+                        }
+                        break;
+                    }
+                }
+
+                render();
+            }
+
+            function render() {
+                preRenderFrame();
+
+                // Draw bricks
+                bricks.forEach(brick => {
+                    ctx.fillStyle = brick.color;
+                    ctx.shadowColor = brick.color;
+                    ctx.shadowBlur = 8;
+                    ctx.fillRect(brick.x + 1, brick.y + 1, brick.width - 2, brick.height - 2);
+                    ctx.strokeStyle = brick.color;
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+                });
+
+                // Draw paddle
+                ctx.fillStyle = "#00ffcc";
+                ctx.shadowColor = "#00ffcc";
+                ctx.shadowBlur = 10;
+                ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+
+                // Draw ball
+                ctx.fillStyle = "#ffff00";
+                ctx.shadowColor = "#ffff00";
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ballSize, 0, Math.PI*2);
+                ctx.fill();
 
                 postRenderFrame();
             }

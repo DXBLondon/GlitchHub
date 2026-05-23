@@ -110,6 +110,10 @@
             transform: translateY(-10px);
         }
 
+        .game-card-large {
+            grid-column: 1 / -1;
+        }
+
         .game-icon {
             background: linear-gradient(135deg, #00ffcc, #0099ff);
             -webkit-background-clip: text;
@@ -139,6 +143,12 @@
             border: 2px solid #00ffcc;
             box-shadow: 0 0 40px rgba(0, 255, 204, 0.15);
             cursor: pointer;
+        }
+
+        #emuContainer {
+            width: 100%;
+            height: 100%;
+            background: #04010a;
         }
     </style>
 </head>
@@ -185,6 +195,16 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- OG Super Mario Bros - Large Card -->
+                <div onclick="startGame('smb')" class="game-card game-card-large p-12 rounded-2xl cursor-pointer group flex flex-col justify-between bg-gradient-to-br from-orange-950/50 to-red-950/50 border-2 border-red-400/40 hover:border-red-400/80 transform hover:scale-102">
+                    <div>
+                        <div class="text-6xl mb-6 game-icon"><i class="fas fa-gamepad"></i></div>
+                        <h3 class="text-4xl font-black font-display mb-4 text-red-400 uppercase tracking-wider">OG Super Mario Bros</h3>
+                        <p class="text-gray-300 text-base leading-relaxed font-light">The legendary NES classic. Jump through pipes, stomp on Goombas, and save Princess Peach. Pure retro gaming excellence in an emulated NES core module.</p>
+                    </div>
+                    <div class="mt-8 font-display text-sm tracking-wider text-red-400 uppercase group-hover:underline">Activate Legacy Protocol &rarr;</div>
+                </div>
+
                 <!-- Card Elements -->
                 <div onclick="startGame('snake')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
                     <div>
@@ -208,7 +228,7 @@
                     <div>
                         <div class="text-4xl mb-4 game-icon"><i class="fas fa-dove"></i></div>
                         <h3 class="text-2xl font-black font-display mb-2 text-yellow-400">CYBER BIRD</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Real-time delta variable integration, precise particle collision box scaling, spatial vector angles, and background scrolling loops.</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Real-time delta variable integration, precise particle collision box scaling, spatial vector angles, and background scrolling logic.</p>
                     </div>
                     <div class="mt-6 font-display text-xs tracking-wider text-yellow-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
                 </div>
@@ -217,7 +237,7 @@
                     <div>
                         <div class="text-4xl mb-4 game-icon"><i class="fas fa-dice-d20"></i></div>
                         <h3 class="text-2xl font-black font-display mb-2 text-purple-400">3D DICE 21</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Geometric projection algorithms calculating 3D rotation structures, automated weight distributions, and full strategic blackjack choices.</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Geometric projection algorithms calculating 3D rotation structures, automated weight distributions, and full strategic blackjack logic.</p>
                     </div>
                     <div class="mt-6 font-display text-xs tracking-wider text-purple-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
                 </div>
@@ -257,13 +277,14 @@
                 </div>
             </div>
 
-            <div class="relative overflow-hidden rounded-xl bg-black flex justify-center items-center">
-                <canvas id="gameCanvas" width="800" height="450" class="max-w-full h-auto"></canvas>
+            <div class="relative overflow-hidden rounded-xl bg-black flex justify-center items-center min-h-96" id="gameCanvasContainer">
+                <canvas id="gameCanvas" width="800" height="450" class="max-w-full h-auto" style="display: none;"></canvas>
+                <div id="emuContainer" style="display: none;"></div>
             </div>
 
             <div class="flex flex-wrap justify-center gap-4 mt-6">
-                <button id="startBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-black font-display tracking-widest px-8 py-3 rounded-xl transition text-sm uppercase shadow-lg shadow-emerald-950/50" onclick="triggerGameStart()">INITIALIZE</button>
-                <button id="actionBtn" class="bg-white/10 hover:bg-white/20 text-white font-black font-display tracking-widest px-6 py-3 rounded-xl transition text-sm uppercase hidden" onclick="triggerGameAction()"></button>
+                <button id="startBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-black font-display tracking-widest px-8 py-3 rounded-xl transition uppercase text-sm" onclick="triggerGameStart()">INITIALIZE INSTANCE</button>
+                <button id="actionBtn" class="bg-white/10 hover:bg-white/20 text-white font-black font-display tracking-widest px-6 py-3 rounded-xl transition text-sm uppercase hidden" onclick="triggerGameAction()">ACTION</button>
                 <button class="bg-rose-950/40 hover:bg-rose-900/50 text-rose-400 font-bold border border-rose-500/20 px-6 py-3 rounded-xl transition text-sm tracking-wide" onclick="goHome()">KILL PROCESS</button>
             </div>
         </div>
@@ -301,6 +322,7 @@
         }
 
         function updateAndRenderParticles() {
+            if (!ctx) return;
             for(let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.x += p.vx; p.y += p.vy;
@@ -341,14 +363,20 @@
             document.getElementById('games-section').classList.remove('active');
             document.getElementById('game-container').classList.add('active');
             currentGame = gameName;
-            canvas = document.getElementById('gameCanvas');
-            ctx = canvas.getContext('2d');
-            particles = []; shakeIntensity = 0;
-            initializeGameModule(gameName);
+            
+            if(gameName === 'smb') {
+                initializeGameModule(gameName);
+            } else {
+                canvas = document.getElementById('gameCanvas');
+                ctx = canvas.getContext('2d');
+                particles = []; shakeIntensity = 0;
+                initializeGameModule(gameName);
+            }
         }
 
         // Render Structural Background Grid Vector
         function drawVectorGrid() {
+            if (!ctx) return;
             ctx.strokeStyle = "rgba(0, 255, 204, 0.03)";
             ctx.lineWidth = 1;
             let gridSize = 30;
@@ -358,6 +386,7 @@
 
         // Context Matrix Transformation Calculations for Shake effects
         function preRenderFrame() {
+            if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
             if(shakeIntensity > 0) {
@@ -371,6 +400,7 @@
         }
 
         function postRenderFrame() {
+            if (!ctx) return;
             updateAndRenderParticles();
             ctx.restore();
         }
@@ -388,9 +418,16 @@
             startBtn.textContent = "INITIALIZE INSTANCE";
             document.getElementById('gameScore').textContent = "00000";
 
-            canvas.onclick = null;
+            if(name !== 'smb') {
+                canvas.onclick = null;
+            }
 
             switch(name) {
+                case 'smb':
+                    title.textContent = "OG Super Mario Bros Protocol";
+                    instructions.textContent = "Arrow Keys: Move & Jump. Reach the flag to complete the level. Original NES emulation module active.";
+                    setupSMB();
+                    break;
                 case 'snake':
                     title.textContent = "Neon Snake Array";
                     instructions.textContent = "Directional Keys: Controls structural expansion trace vector grid. Objective: Consume data chips.";
@@ -432,6 +469,46 @@
         }
 
         // ==========================================
+        // 0. SUPER MARIO BROS EMULATOR ENGINE
+        // ==========================================
+        function setupSMB() {
+            const canvasEl = document.getElementById('gameCanvas');
+            const emuContainer = document.getElementById('emuContainer');
+
+            gameInstance = {
+                start: function() {
+                    document.getElementById('startBtn').classList.add('hidden');
+                    
+                    // Hide canvas, show emulator container
+                    canvasEl.style.display = 'none';
+                    emuContainer.style.display = 'block';
+                    emuContainer.innerHTML = '';
+
+                    // Setup emulator
+                    window.EJS_player = emuContainer;
+                    window.EJS_core = "nes";
+                    window.EJS_color = "#000000";
+                    window.EJS_startOnLoaded = true;
+                    window.EJS_pathtodata = "https://cdn.jsdelivr.net/gh/a456pur/seraph@81f551ca0aa8e3d6018d32d8ac5904ac9bc78f76/storage/emulatorjs/data";
+                    window.EJS_gameUrl = "https://cdn.jsdelivr.net/gh/bubbls/UGS-file-encryption@e0c78a58432c6486ebe1a50a78d263df65809a83/Super%20Mario%20Bros.%20(Europe).zip";
+
+                    // Load emulator script
+                    const script = document.createElement('script');
+                    script.src = "https://cdn.jsdelivr.net/gh/a456pur/seraph@81f551ca0aa8e3d6018d32d8ac5904ac9bc78f76/storage/emulatorjs/data/loader.js";
+                    document.body.appendChild(script);
+
+                    const script2 = document.createElement('script');
+                    script2.src = "https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/storage/js/cloak.js";
+                    document.body.appendChild(script2);
+                }
+            };
+
+            // Initial render
+            canvasEl.style.display = 'none';
+            emuContainer.style.display = 'none';
+        }
+
+        // ==========================================
         // 1. NEON SNAKE SYSTEM UPGRADE ENGINE
         // ==========================================
         function setupSnake() {
@@ -448,6 +525,12 @@
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+                    
                     snake = [{x: 120, y: 120}, {x: 105, y: 120}, {x: 90, y: 120}];
                     dir = {x: grid, y: 0}; nextDir = {x: grid, y: 0};
                     score = 0; isRunning = true; stepCounter = 0; gameSpeed = 5; 
@@ -565,6 +648,12 @@
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+                    
                     initGrid();
                     flipped = []; matches = 0; score = 0; clicks = 0; canClick = true;
                     document.getElementById('startBtn').classList.add('hidden');
@@ -695,6 +784,12 @@
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+                    
                     birdY = 200; birdV = 0; score = 0; isRunning = true;
                     pipes = [];
                     spawnPipe();
@@ -818,6 +913,12 @@
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+                    
                     playerTotal = 0; currentRoll = 1; isRolling = false; gameActive = true;
                     messageText = "Roll initialization loop prepared.";
                     startBtn.classList.add('hidden');
@@ -1002,57 +1103,55 @@
         // 5. QUANTUM CLICKER SYSTEM UPGRADE ENGINE
         // ==========================================
         function setupClicker() {
-            let score, timeLeft, activeTargets, isRunning, lastSpawn;
-            let targetFrequency = 900; 
+            let score, isRunning, gameSpeed, targets, clickCounter, targetSize;
+            const maxTargets = 5;
 
             function spawnTarget() {
-                let r = Math.random() * 20 + 15; 
-                let margin = 50;
-                let isGolden = Math.random() < 0.15; 
-                activeTargets.push({
-                    x: Math.random() * (canvas.width - margin*2) + margin,
-                    y: Math.random() * (canvas.height - margin*2) + margin,
-                    radius: r, maxRadius: r + (isGolden ? 15 : 5), pulseDir: 1,
-                    isGolden: isGolden, life: 1.0, decay: Math.random() * 0.01 + 0.008
-                });
+                return {
+                    x: Math.random() * (canvas.width - 80) + 40,
+                    y: Math.random() * (canvas.height - 80) + 40,
+                    radius: 40,
+                    health: 1,
+                    color: ['#ff0055', '#00ffcc', '#0099ff', '#ffaa00'][Math.floor(Math.random() * 4)]
+                };
             }
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    score = 0; timeLeft = 30.0; activeTargets = []; isRunning = true; lastSpawn = 0;
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+                    
+                    score = 0; isRunning = true; gameSpeed = 1; targets = []; clickCounter = 0; targetSize = 40;
+                    for(let i = 0; i < 3; i++) targets.push(spawnTarget());
                     document.getElementById('startBtn').classList.add('hidden');
                     document.getElementById('gameScore').textContent = "00000";
-                    
-                    canvas.onclick = handleClickInputTrace;
+                    canvas.onclick = handleCanvasClick;
                     loop();
                 }
             };
 
-            function handleClickInputTrace(e) {
+            function handleCanvasClick(e) {
                 const rect = canvas.getBoundingClientRect();
                 const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
                 const my = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-                let hitRegistered = false;
-                for(let i=activeTargets.length-1; i>=0; i--) {
-                    let t = activeTargets[i];
+                for(let i = targets.length - 1; i >= 0; i--) {
+                    let t = targets[i];
                     let dist = Math.hypot(mx - t.x, my - t.y);
-                    if(dist < t.radius + 5) {
-                        hitRegistered = true;
-                        let pointsGained = t.isGolden ? 500 : 100;
-                        score += pointsGained;
+                    if(dist < t.radius) {
+                        clickCounter++;
+                        score += 100 * gameSpeed;
                         document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                        
-                        applyScreenShake(t.isGolden ? 12 : 5);
-                        createExplosion(t.x, t.y, t.isGolden ? "#ffaa00" : "#00ffcc", 20);
-                        activeTargets.splice(i, 1);
+                        createExplosion(t.x, t.y, t.color, 15);
+                        applyScreenShake(3);
+                        targets.splice(i, 1);
+                        if(clickCounter % 5 === 0) { gameSpeed += 0.2; }
                         break;
                     }
-                }
-                if(!hitRegistered && score >= 50) { 
-                    score -= 50; 
-                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0'); 
                 }
             }
 
@@ -1060,70 +1159,34 @@
                 if(!isRunning) return;
                 animationId = requestAnimationFrame(loop);
 
-                timeLeft -= 1/60; 
-                if(timeLeft <= 0) { timeLeft = 0; gameOver(); return; }
+                if(targets.length < maxTargets && Math.random() > 0.7) targets.push(spawnTarget());
 
-                let now = performance.now();
-                if(now - lastSpawn > targetFrequency) {
-                    spawnTarget(); lastSpawn = now;
-                    if(targetFrequency > 400) targetFrequency -= 10;
-                }
-
-                for(let i=activeTargets.length-1; i>=0; i--) {
-                    let t = activeTargets[i];
-                    t.life -= t.decay;
-                    if(t.life <= 0) { activeTargets.splice(i, 1); continue; }
-                    
-                    t.radius += 0.15 * t.pulseDir;
-                    if(t.radius > t.maxRadius || t.radius < 10) t.pulseDir *= -1;
-                }
+                targets.forEach(t => {
+                    t.x += (Math.random() - 0.5) * 2;
+                    t.y += (Math.random() - 0.5) * 2;
+                    t.x = Math.max(t.radius, Math.min(canvas.width - t.radius, t.x));
+                    t.y = Math.max(t.radius, Math.min(canvas.height - t.radius, t.y));
+                });
 
                 render();
-            }
-
-            function gameOver() {
-                isRunning = false;
-                canvas.onclick = null;
-                document.getElementById('startBtn').classList.remove('hidden');
-                document.getElementById('startBtn').textContent = "REENGAGE QUANTUM MATRIX";
             }
 
             function render() {
                 preRenderFrame();
 
-                activeTargets.forEach(t => {
+                targets.forEach(t => {
                     ctx.save();
-                    ctx.globalAlpha = t.life;
-                    ctx.shadowBlur = t.isGolden ? 25 : 15;
-                    ctx.shadowColor = t.isGolden ? "#ffaa00" : "#00ffcc";
-                    
-                    let glow = ctx.createRadialGradient(t.x, t.y, t.radius * 0.2, t.x, t.y, t.radius);
-                    if(t.isGolden) {
-                        glow.addColorStop(0, "#ffffff"); glow.addColorStop(0.3, "#ffaa00"); glow.addColorStop(1, "rgba(255, 170, 0, 0)");
-                    } else {
-                        glow.addColorStop(0, "#ffffff"); glow.addColorStop(0.3, "#00ffcc"); glow.addColorStop(1, "rgba(0, 255, 204, 0)");
-                    }
-                    
-                    ctx.fillStyle = glow;
-                    ctx.beginPath(); ctx.arc(t.x, t.y, t.radius, 0, Math.PI*2); ctx.fill();
-                    
-                    ctx.strokeStyle = t.isGolden ? "#ffaa00" : "#00ffcc";
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath(); ctx.arc(t.x, t.y, t.radius + 3, 0, Math.PI*2); ctx.stroke();
+                    ctx.shadowBlur = 20; ctx.shadowColor = t.color;
+                    ctx.fillStyle = t.color;
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, t.radius, 0, Math.PI*2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
                     ctx.restore();
                 });
-
-                ctx.fillStyle = timeLeft < 5 ? "#ff0055" : "#fff";
-                ctx.font = "bold 22px 'Orbitron'";
-                ctx.textAlign = "left";
-                ctx.fillText(`TIME_REMAINING: ${timeLeft.toFixed(2)}s`, 25, 40);
-
-                if(!isRunning) {
-                    ctx.fillStyle = "#ff0055";
-                    ctx.font = "bold 50px 'Orbitron'";
-                    ctx.textAlign = "center";
-                    ctx.fillText("MATRIX LIFECYCLE EXPIRED", canvas.width/2, canvas.height/2);
-                }
 
                 postRenderFrame();
             }
@@ -1133,125 +1196,114 @@
         }
 
         // ==========================================
-        // 6. PONG LOGIC PROTOCOL SYSTEM ENGINE
+        // 6. PONG LOGIC PROTOCOL ENGINE
         // ==========================================
         function setupPong() {
-            let p1Y, p2Y, ballX, ballY, vx, vy, p1Score, p2Score, isRunning;
-            const padW = 12, padH = 90, ballRadius = 8;
-            let currentBallSpeed = 5.5;
+            let ballX, ballY, ballVX, ballVY, ballRadius, paddleY, computerPaddleY, score, isRunning;
+            const paddleWidth = 12, paddleHeight = 80, ballSpeed = 4;
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    p1Y = 180; p2Y = 180; p1Score = 0; p2Score = 0; isRunning = true;
-                    resetVectorBall(1);
+                    const canvasEl = document.getElementById('gameCanvas');
+                    canvasEl.style.display = 'block';
+                    document.getElementById('emuContainer').style.display = 'none';
+                    canvas = canvasEl;
+                    ctx = canvas.getContext('2d');
+                    
+                    ballX = canvas.width / 2;
+                    ballY = canvas.height / 2;
+                    ballVX = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
+                    ballVY = ballSpeed * (Math.random() - 0.5);
+                    ballRadius = 6;
+                    paddleY = canvas.height / 2 - paddleHeight / 2;
+                    computerPaddleY = canvas.height / 2 - paddleHeight / 2;
+                    score = 0;
+                    isRunning = true;
                     document.getElementById('startBtn').classList.add('hidden');
-                    document.getElementById('gameScore').textContent = "00 - 00";
+                    document.getElementById('gameScore').textContent = "00000";
                     loop();
                 }
             };
-
-            function resetVectorBall(directionSign) {
-                ballX = canvas.width / 2;
-                ballY = canvas.height / 2;
-                currentBallSpeed = 5.5;
-                let angleOffset = (Math.random() - 0.5) * (Math.PI / 4); 
-                vx = Math.cos(angleOffset) * currentBallSpeed * directionSign;
-                vy = Math.sin(angleOffset) * currentBallSpeed;
-            }
 
             function loop() {
                 if(!isRunning) return;
                 animationId = requestAnimationFrame(loop);
 
-                if((keys['ArrowUp'] || keys['w']) && p1Y > 10) p1Y -= 6.5;
-                if((keys['ArrowDown'] || keys['s']) && p1Y < canvas.height - padH - 10) p1Y += 6.5;
+                // Player paddle movement
+                if((keys['ArrowUp'] || keys['w']) && paddleY > 0) paddleY -= 6;
+                if((keys['ArrowDown'] || keys['s']) && paddleY < canvas.height - paddleHeight) paddleY += 6;
 
-                let targetTrackDestination = ballY - padH / 2;
-                let deltaMoveTracking = targetTrackDestination - p2Y;
-                let maxMachineInertiaSpeed = 4.8; 
-                p2Y += Math.min(Math.max(deltaMoveTracking, -maxMachineInertiaSpeed), maxMachineInertiaSpeed);
-                
-                if(p2Y < 10) p2Y = 10; if(p2Y > canvas.height - padH - 10) p2Y = canvas.height - padH - 10;
+                // Ball movement
+                ballX += ballVX;
+                ballY += ballVY;
 
-                ballX += vx; ballY += vy;
-
-                if(ballY - ballRadius < 0) { ballY = ballRadius; vy = -vy; applyScreenShake(2); }
-                if(ballY + ballRadius > canvas.height) { ballY = canvas.height - ballRadius; vy = -vy; applyScreenShake(2); }
-
-                if(vx < 0) {
-                    if(ballX - ballRadius < 40 && ballX - ballRadius > 20 && ballY > p1Y && ballY < p1Y + padH) {
-                        let relativeIntersectPointY = (p1Y + (padH / 2)) - ballY;
-                        let normalizedRelativeIntersectionPointY = (relativeIntersectPointY / (padH / 2));
-                        let bounceAngleRad = normalizedRelativeIntersectionPointY * (Math.PI / 3);
-                        
-                        currentBallSpeed += 0.4; 
-                        vx = Math.cos(bounceAngleRad) * currentBallSpeed;
-                        vy = -Math.sin(bounceAngleRad) * currentBallSpeed;
-                        
-                        createExplosion(40, ballY, '#00ffcc', 12);
-                        applyScreenShake(5);
-                    }
-                } else {
-                    if(ballX + ballRadius > canvas.width - 40 && ballX + ballRadius < canvas.width - 20 && ballY > p2Y && ballY < p2Y + padH) {
-                        let relativeIntersectPointY = (p2Y + (padH / 2)) - ballY;
-                        let normalizedRelativeIntersectionPointY = (relativeIntersectPointY / (padH / 2));
-                        let bounceAngleRad = normalizedRelativeIntersectionPointY * (Math.PI / 3);
-                        
-                        currentBallSpeed += 0.4;
-                        vx = -Math.cos(bounceAngleRad) * currentBallSpeed;
-                        vy = -Math.sin(bounceAngleRad) * currentBallSpeed;
-                        
-                        createExplosion(canvas.width - 40, ballY, '#0099ff', 12);
-                        applyScreenShake(5);
-                    }
+                // Ball collision with top/bottom
+                if(ballY - ballRadius < 0 || ballY + ballRadius > canvas.height) {
+                    ballVY *= -1;
+                    ballY = Math.max(ballRadius, Math.min(canvas.height - ballRadius, ballY));
                 }
 
-                if(ballX < 0) { p2Score++; updateTelemetryText(); createExplosion(20, ballY, '#ff0055', 25); applyScreenShake(15); verifyScoreLimit(1); }
-                else if(ballX > canvas.width) { p1Score++; updateTelemetryText(); createExplosion(canvas.width-20, ballY, '#00ffcc', 25); applyScreenShake(15); verifyScoreLimit(-1); }
+                // Ball collision with paddles
+                if(ballX - ballRadius < 20 && ballY > paddleY && ballY < paddleY + paddleHeight) {
+                    ballVX = Math.abs(ballVX);
+                    applyScreenShake(5);
+                    createExplosion(ballX, ballY, '#00ffcc', 10);
+                }
+                if(ballX + ballRadius > canvas.width - 20 && ballY > computerPaddleY && ballY < computerPaddleY + paddleHeight) {
+                    ballVX = -Math.abs(ballVX);
+                    applyScreenShake(5);
+                    createExplosion(ballX, ballY, '#ff0055', 10);
+                }
+
+                // AI paddle movement
+                let computerCenter = computerPaddleY + paddleHeight / 2;
+                if(computerCenter < ballY - 35) computerPaddleY += 5;
+                if(computerCenter > ballY + 35) computerPaddleY -= 5;
+                computerPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, computerPaddleY));
+
+                // Scoring
+                if(ballX < 0) {
+                    score += 100;
+                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                    ballX = canvas.width / 2;
+                    ballY = canvas.height / 2;
+                    ballVX = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
+                    ballVY = ballSpeed * (Math.random() - 0.5);
+                    createExplosion(canvas.width / 2, canvas.height / 2, '#00ff00', 20);
+                }
+                if(ballX > canvas.width) {
+                    if(score > 0) score -= 50;
+                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                    ballX = canvas.width / 2;
+                    ballY = canvas.height / 2;
+                    ballVX = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
+                    ballVY = ballSpeed * (Math.random() - 0.5);
+                    createExplosion(canvas.width / 2, canvas.height / 2, '#ff0055', 20);
+                }
 
                 render();
-            }
-
-            function updateTelemetryText() {
-                document.getElementById('gameScore').textContent = `${String(p1Score).padStart(2,'0')} - ${String(p2Score).padStart(2,'0')}`;
-            }
-
-            function verifyScoreLimit(signDir) {
-                if(p1Score >= 5 || p2Score >= 5) {
-                    isRunning = false;
-                    document.getElementById('startBtn').classList.remove('hidden');
-                    document.getElementById('startBtn').textContent = "CYCLE NET ENGINE MODULE";
-                } else {
-                    resetVectorBall(signDir);
-                }
             }
 
             function render() {
                 preRenderFrame();
 
-                ctx.save();
-                ctx.shadowBlur = 15;
-                
-                ctx.fillStyle = "#00ffcc"; ctx.shadowColor = "#00ffcc";
-                ctx.fillRect(25, p1Y, padW, padH);
+                // Draw paddles
+                ctx.fillStyle = '#00ffcc';
+                ctx.shadowBlur = 15; ctx.shadowColor = '#00ffcc';
+                ctx.fillRect(10, paddleY, paddleWidth, paddleHeight);
 
-                ctx.fillStyle = "#0099ff"; ctx.shadowColor = "#0099ff";
-                ctx.fillRect(canvas.width - 25 - padW, p2Y, padW, padH);
+                ctx.fillStyle = '#ff0055';
+                ctx.shadowColor = '#ff0055';
+                ctx.fillRect(canvas.width - 22, computerPaddleY, paddleWidth, paddleHeight);
 
-                ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 2; ctx.setLineDash([10, 10]);
-                ctx.beginPath(); ctx.moveTo(canvas.width/2, 0); ctx.lineTo(canvas.width/2, canvas.height); ctx.stroke();
-                ctx.setLineDash([]); 
-
-                ctx.fillStyle = "#fff"; ctx.shadowColor = "#fff"; ctx.shadowBlur = 20;
-                ctx.beginPath(); ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2); ctx.fill();
-                ctx.restore();
-
-                if(!isRunning) {
-                    ctx.fillStyle = p1Score >= 5 ? "#00ffcc" : "#ff0055";
-                    ctx.font = "bold 40px 'Orbitron'"; ctx.textAlign = "center";
-                    ctx.fillText(p1Score >= 5 ? "USER MODULE TRIUMPH" : "PROCESSOR TERMINATION FAILURE", canvas.width/2, canvas.height/2);
-                }
+                // Draw ball
+                ctx.fillStyle = '#0099ff';
+                ctx.shadowColor = '#0099ff';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
+                ctx.fill();
 
                 postRenderFrame();
             }

@@ -147,8 +147,10 @@
 
         #emuContainer {
             width: 100%;
-            height: 100%;
-            background: #04010a;
+            height: 450px;
+            background: #000000;
+            border: 2px solid #ff0055;
+            box-shadow: 0 0 40px rgba(255, 0, 85, 0.15);
         }
     </style>
 </head>
@@ -222,42 +224,6 @@
                         <p class="text-gray-400 text-sm leading-relaxed">Fluid card flip transforms, item tracking indexes, visual particle splash bursts, and combo performance metrics.</p>
                     </div>
                     <div class="mt-6 font-display text-xs tracking-wider text-pink-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
-                </div>
-
-                <div onclick="startGame('flappy')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
-                    <div>
-                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-dove"></i></div>
-                        <h3 class="text-2xl font-black font-display mb-2 text-yellow-400">CYBER BIRD</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Real-time delta variable integration, precise particle collision box scaling, spatial vector angles, and background scrolling logic.</p>
-                    </div>
-                    <div class="mt-6 font-display text-xs tracking-wider text-yellow-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
-                </div>
-
-                <div onclick="startGame('dice')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
-                    <div>
-                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-dice-d20"></i></div>
-                        <h3 class="text-2xl font-black font-display mb-2 text-purple-400">3D DICE 21</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Geometric projection algorithms calculating 3D rotation structures, automated weight distributions, and full strategic blackjack logic.</p>
-                    </div>
-                    <div class="mt-6 font-display text-xs tracking-wider text-purple-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
-                </div>
-
-                <div onclick="startGame('clicker')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
-                    <div>
-                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-bolt"></i></div>
-                        <h3 class="text-2xl font-black font-display mb-2 text-green-400">QUANTUM CLICKER</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Dynamic element sizing arrays, high speed processing calculations, random special combo target spawns, and chain multipliers.</p>
-                    </div>
-                    <div class="mt-6 font-display text-xs tracking-wider text-green-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
-                </div>
-
-                <div onclick="startGame('pong')" class="game-card p-8 rounded-2xl cursor-pointer group flex flex-col justify-between">
-                    <div>
-                        <div class="text-4xl mb-4 game-icon"><i class="fas fa-table-tennis-paddle-ball"></i></div>
-                        <h3 class="text-2xl font-black font-display mb-2 text-blue-400">PONG PROTOCOL</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Dynamic kinetic velocity angle curves based on contact location, elastic physics calculations, and humanized processing lag AI.</p>
-                    </div>
-                    <div class="mt-6 font-display text-xs tracking-wider text-blue-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
                 </div>
             </div>
         </div>
@@ -351,12 +317,47 @@
             document.getElementById('games-section').classList.add('active');
         }
 
+        // ==========================================
+        // DEEP INSTANCE KILL ROUTINE (ABORT & PURGE)
+        // ==========================================
         function goHome() {
-            if (animationId) cancelAnimationFrame(animationId);
+            // 1. Immediately kill standard requestAnimationFrame loops
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            // 2. Erase the emulator container structure to kill internal iframe/canvas contexts
+            const emuContainer = document.getElementById('emuContainer');
+            if (emuContainer) {
+                emuContainer.innerHTML = '';
+                emuContainer.style.display = 'none';
+            }
+            
+            // 3. Rip down runtime loader scripts to block dynamic assets from finishing downloads
+            const oldScript = document.getElementById('emu-loader-script');
+            if (oldScript) oldScript.remove();
+            
+            // 4. Force global emulator window objects out of existence to stop audio buffers & events
+            delete window.EJS_player;
+            delete window.EJS_core;
+            delete window.EJS_gameUrl;
+            delete window.EJS_startOnLoaded;
+            delete window.EJS_pathtodata;
+            delete window.EJS_color;
+            
+            // Unbind key/pointer handlers from specific arcade setups
+            if (canvas) {
+                canvas.onclick = null;
+                canvas.style.display = 'none';
+            }
+            ctx = null;
+            currentGame = null;
+
+            // 5. Restore core structural layout display styles
             document.getElementById('home-section').style.display = 'flex';
             document.getElementById('games-section').classList.remove('active');
             document.getElementById('game-container').classList.remove('active');
-            currentGame = null;
         }
 
         function startGame(gameName) {
@@ -425,7 +426,7 @@
             switch(name) {
                 case 'smb':
                     title.textContent = "OG Super Mario Bros Protocol";
-                    instructions.textContent = "Arrow Keys: Move & Jump. Reach the flag to complete the level. Original NES emulation module active.";
+                    instructions.textContent = "Arrow Keys: Move & Crouch. Z/X or S/A: Sprint & Jump. Enter: Start. Shift: Select.";
                     setupSMB();
                     break;
                 case 'snake':
@@ -437,26 +438,6 @@
                     title.textContent = "Matrix Match Matrix";
                     instructions.textContent = "Input Target Pointer: Click tiles to decode duplicate encrypted memory nodes.";
                     setupMemory();
-                    break;
-                case 'flappy':
-                    title.textContent = "Cyber Bird Vector";
-                    instructions.textContent = "Spacebar / Canvas Click: Discharges upward lift thrust delta variable to avoid firewalls.";
-                    setupFlappy();
-                    break;
-                case 'dice':
-                    title.textContent = "3D Dice Protocol";
-                    instructions.textContent = "Process dynamic outcome metrics. Pull values closest to quantitative value 21.";
-                    setupDice();
-                    break;
-                case 'clicker':
-                    title.textContent = "Quantum Clicker Matrix";
-                    instructions.textContent = "Target click popping element modules. Maintain efficiency velocity ratios.";
-                    setupClicker();
-                    break;
-                case 'pong':
-                    title.textContent = "Pong Logic Protocol";
-                    instructions.textContent = "Controls: ArrowUp/ArrowDown to guide reflective pad against machine processor logic.";
-                    setupPong();
                     break;
             }
         }
@@ -474,36 +455,31 @@
         function setupSMB() {
             const canvasEl = document.getElementById('gameCanvas');
             const emuContainer = document.getElementById('emuContainer');
+            const startBtn = document.getElementById('startBtn');
 
             gameInstance = {
                 start: function() {
-                    document.getElementById('startBtn').classList.add('hidden');
-                    
-                    // Hide canvas, show emulator container
+                    startBtn.classList.add('hidden');
                     canvasEl.style.display = 'none';
                     emuContainer.style.display = 'block';
                     emuContainer.innerHTML = '';
 
-                    // Setup emulator
-                    window.EJS_player = emuContainer;
+                    // Define Target Layout Configuration Properties
+                    window.EJS_player = '#emuContainer';
                     window.EJS_core = "nes";
                     window.EJS_color = "#000000";
                     window.EJS_startOnLoaded = true;
                     window.EJS_pathtodata = "https://cdn.jsdelivr.net/gh/a456pur/seraph@81f551ca0aa8e3d6018d32d8ac5904ac9bc78f76/storage/emulatorjs/data";
                     window.EJS_gameUrl = "https://cdn.jsdelivr.net/gh/bubbls/UGS-file-encryption@e0c78a58432c6486ebe1a50a78d263df65809a83/Super%20Mario%20Bros.%20(Europe).zip";
 
-                    // Load emulator script
+                    // Inject Compiled Web Loader runtime scripts
                     const script = document.createElement('script');
                     script.src = "https://cdn.jsdelivr.net/gh/a456pur/seraph@81f551ca0aa8e3d6018d32d8ac5904ac9bc78f76/storage/emulatorjs/data/loader.js";
+                    script.id = "emu-loader-script";
                     document.body.appendChild(script);
-
-                    const script2 = document.createElement('script');
-                    script2.src = "https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/storage/js/cloak.js";
-                    document.body.appendChild(script2);
                 }
             };
 
-            // Initial render
             canvasEl.style.display = 'none';
             emuContainer.style.display = 'none';
         }
@@ -619,12 +595,13 @@
         // 2. MATRIX MATCH SYSTEM UPGRADE ENGINE
         // ==========================================
         function setupMemory() {
-            let cards, flipped, matches, score, clicks, canClick;
+            let cards, flipped, matches, score, canClick;
             const symbols = ['⚡', '👾', '🚀', '💎', '🎯', '🔥', '🔮', '👑'];
             const cols = 4, rows = 4;
-            const w = 100, h = 100;
-            const startX = (800 - (cols * 130)) / 2;
-            const startY = (450 - (rows * 115)) / 2;
+            const w = 90, h = 90;
+            const gap = 20;
+            const startX = (800 - (cols * (w + gap))) / 2;
+            const startY = (450 - (rows * (h + gap))) / 2;
 
             function initGrid() {
                 let pool = [...symbols, ...symbols];
@@ -639,8 +616,8 @@
                     let c = i % cols;
                     cards.push({
                         id: i, symbol: pool[i],
-                        x: startX + c * 130, y: startY + r * 115,
-                        flipped: false, matched: false, flipAnim: 0
+                        x: startX + c * (w + gap), y: startY + r * (h + gap),
+                        flipped: false, matched: false
                     });
                 }
             }
@@ -655,7 +632,7 @@
                     ctx = canvas.getContext('2d');
                     
                     initGrid();
-                    flipped = []; matches = 0; score = 0; clicks = 0; canClick = true;
+                    flipped = []; matches = 0; score = 0; canClick = true;
                     document.getElementById('startBtn').classList.add('hidden');
                     document.getElementById('gameScore').textContent = "00000";
                     canvas.onclick = handleCanvasClick;
@@ -673,28 +650,28 @@
                     if(!card.flipped && !card.matched && mx > card.x && mx < card.x + w && my > card.y && my < card.y + h) {
                         card.flipped = true;
                         flipped.push(card);
-                        clicks++;
-                        
+                        createExplosion(card.x + w/2, card.y + h/2, '#0099ff', 8);
+
                         if(flipped.length === 2) {
                             canClick = false;
-                            let [c1, c2] = flipped;
-                            if(c1.symbol === c2.symbol) {
-                                setTimeout(() => {
-                                    c1.matched = true; c2.matched = true;
-                                    matches++; score += 500;
-                                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                                    createExplosion(c1.x + w/2, c1.y + h/2, '#00ffcc', 20);
-                                    createExplosion(c2.x + w/2, c2.y + h/2, '#00ffcc', 20);
-                                    applyScreenShake(5);
-                                    flipped = []; canClick = true;
-                                    if(matches === 8) win();
-                                }, 300);
+                            if(flipped[0].symbol === flipped[1].symbol) {
+                                score += 200;
+                                matches++;
+                                flipped[0].matched = true;
+                                flipped[1].matched = true;
+                                createExplosion(flipped[0].x + w/2, flipped[0].y + h/2, '#00ffcc', 20);
+                                createExplosion(flipped[1].x + w/2, flipped[1].y + h/2, '#00ffcc', 20);
+                                applyScreenShake(6);
+                                flipped = [];
+                                canClick = true;
+                                document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                                if(matches === 8) gameOver();
                             } else {
                                 setTimeout(() => {
-                                    c1.flipped = false; c2.flipped = false;
-                                    flipped = []; canClick = true;
-                                    if(score > 50) score -= 50;
-                                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                                    flipped[0].flipped = false;
+                                    flipped[1].flipped = false;
+                                    flipped = [];
+                                    canClick = true;
                                 }, 1000);
                             }
                         }
@@ -703,607 +680,60 @@
                 }
             }
 
-            function win() {
+            function gameOver() {
                 applyScreenShake(15);
                 document.getElementById('startBtn').classList.remove('hidden');
-                document.getElementById('startBtn').textContent = "RESTART DATA SYNC";
+                document.getElementById('startBtn').textContent = "RESET MATRIX MATCH";
             }
 
             function loop() {
-                if(matches === 8) { render(); return; }
                 animationId = requestAnimationFrame(loop);
-                
-                cards.forEach(c => {
-                    if(c.flipped || c.matched) { if(c.flipAnim < 1) c.flipAnim += 0.1; }
-                    else { if(c.flipAnim > 0) c.flipAnim -= 0.1; }
-                });
-
                 render();
             }
 
             function render() {
                 preRenderFrame();
 
-                cards.forEach(c => {
+                cards.forEach(card => {
+                    if(card.matched) return;
+
                     ctx.save();
-                    ctx.translate(c.x + w/2, c.y + h/2);
-                    let scaleX = Math.abs(1 - c.flipAnim * 2);
-                    ctx.scale(scaleX, 1);
-
-                    ctx.shadowBlur = 10;
-                    if(c.flipAnim < 0.5) {
-                        ctx.fillStyle = "rgba(13, 22, 54, 0.9)";
-                        ctx.strokeStyle = "rgba(0, 255, 204, 0.4)";
-                        ctx.shadowColor = "rgba(0, 255, 204, 0.2)";
+                    if(card.flipped) {
+                        ctx.fillStyle = "rgba(10, 5, 30, 0.9)";
+                        ctx.strokeStyle = "#00ffcc";
+                        ctx.shadowColor = "#00ffcc";
+                        ctx.shadowBlur = 10;
                         ctx.lineWidth = 2;
-                        ctx.fillRect(-w/2, -h/2, w, h);
-                        ctx.strokeRect(-w/2, -h/2, w, h);
+                        ctx.fillRect(card.x, card.y, w, h);
+                        ctx.strokeRect(card.x, card.y, w, h);
                         
-                        ctx.strokeStyle = "rgba(0, 255, 204, 0.1)";
-                        ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.moveTo(0, -10); ctx.lineTo(0, 10); ctx.stroke();
-                    } else {
-                        ctx.fillStyle = c.matched ? "rgba(4, 46, 36, 0.9)" : "rgba(10, 36, 74, 0.9)";
-                        ctx.strokeStyle = c.matched ? "#00ffcc" : "#0099ff";
-                        ctx.shadowColor = c.matched ? "#00ffcc" : "#0099ff";
-                        ctx.lineWidth = 2;
-                        ctx.fillRect(-w/2, -h/2, w, h);
-                        ctx.strokeRect(-w/2, -h/2, w, h);
-
-                        ctx.scale(-1, 1); 
+                        ctx.shadowBlur = 0;
                         ctx.fillStyle = "#fff";
-                        ctx.font = "32px sans-serif";
+                        ctx.font = "32px Outfit";
                         ctx.textAlign = "center";
                         ctx.textBaseline = "middle";
-                        ctx.fillText(c.symbol, 0, 0);
+                        ctx.fillText(card.symbol, card.x + w/2, card.y + h/2);
+                    } else {
+                        ctx.fillStyle = "rgba(255, 0, 85, 0.1)";
+                        ctx.strokeStyle = "rgba(255, 0, 85, 0.4)";
+                        ctx.lineWidth = 1;
+                        ctx.fillRect(card.x, card.y, w, h);
+                        ctx.strokeRect(card.x, card.y, w, h);
+                        
+                        // Cyber Cross decoration lines
+                        ctx.strokeStyle = "rgba(255, 0, 85, 0.2)";
+                        ctx.beginPath(); ctx.moveTo(card.x + 10, card.y + 10); ctx.lineTo(card.x + w - 10, card.y + h - 10); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(card.x + w - 10, card.y + 10); ctx.lineTo(card.x + 10, card.y + h - 10); ctx.stroke();
                     }
                     ctx.restore();
                 });
 
                 if(matches === 8) {
                     ctx.fillStyle = "#00ffcc";
-                    ctx.font = "bold 40px 'Orbitron'";
+                    ctx.font = "40px Orbitron";
                     ctx.textAlign = "center";
-                    ctx.fillText("SYNCHRONIZATION COMPLETE", canvas.width/2, 80);
+                    ctx.fillText("MATRIX INTEGRITY RECONSTRUCTED", canvas.width/2, canvas.height/2);
                 }
-
-                postRenderFrame();
-            }
-
-            initGrid();
-            render();
-        }
-
-        // ==========================================
-        // 3. CYBER BIRD SYSTEM UPGRADE ENGINE
-        // ==========================================
-        function setupFlappy() {
-            let birdY, birdV, score, pipes, isRunning;
-            const gravity = 0.4, jump = -6.5;
-            let targetPipeSpeed = 3.5;
-
-            gameInstance = {
-                start: function() {
-                    if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
-                    ctx = canvas.getContext('2d');
-                    
-                    birdY = 200; birdV = 0; score = 0; isRunning = true;
-                    pipes = [];
-                    spawnPipe();
-                    document.getElementById('startBtn').classList.add('hidden');
-                    document.getElementById('gameScore').textContent = "00000";
-                    
-                    window.addEventListener('keydown', handleJump);
-                    canvas.onclick = () => birdV = jump;
-                    loop();
-                }
-            };
-
-            function handleJump(e) { if(e.key === ' ' || e.key === 'ArrowUp') birdV = jump; }
-            function spawnPipe() {
-                let gap = 130;
-                let minH = 40;
-                let topH = Math.floor(Math.random() * (canvas.height - gap - minH * 2)) + minH;
-                pipes.push({ x: canvas.width, top: topH, bottom: canvas.height - topH - gap, w: 60, passed: false });
-            }
-
-            function loop() {
-                if(!isRunning) return;
-                animationId = requestAnimationFrame(loop);
-
-                birdV += gravity;
-                birdY += birdV;
-
-                if(birdY < 0 || birdY > canvas.height) { gameOver(); return; }
-
-                for(let i=pipes.length-1; i>=0; i--) {
-                    let p = pipes[i];
-                    p.x -= targetPipeSpeed;
-
-                    let birdRadius = 14;
-                    let checkX = (200 + birdRadius > p.x && 200 - birdRadius < p.x + p.w);
-                    let checkTopY = (birdY - birdRadius < p.top);
-                    let checkBotY = (birdY + birdRadius > canvas.height - p.bottom);
-                    
-                    if(checkX && (checkTopY || checkBotY)) { gameOver(); return; }
-
-                    if(!p.passed && p.x + p.w < 200) {
-                        p.passed = true;
-                        score += 100;
-                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                        applyScreenShake(6);
-                        if(score % 500 === 0) targetPipeSpeed += 0.5; 
-                    }
-
-                    if(p.x + p.w < 0) pipes.splice(i, 1);
-                }
-
-                if(pipes.length > 0 && pipes[pipes.length-1].x < canvas.width - 250) spawnPipe();
-
-                render();
-            }
-
-            function gameOver() {
-                isRunning = false;
-                applyScreenShake(30);
-                createExplosion(200, birdY, '#ff0055', 35);
-                window.removeEventListener('keydown', handleJump);
-                canvas.onclick = null;
-                document.getElementById('startBtn').classList.remove('hidden');
-                document.getElementById('startBtn').textContent = "CYCLE FIREWALL MATRIX";
-            }
-
-            function render() {
-                preRenderFrame();
-
-                pipes.forEach(p => {
-                    ctx.save();
-                    ctx.shadowBlur = 15;
-                    
-                    let topGrd = ctx.createLinearGradient(p.x, 0, p.x + p.w, 0);
-                    topGrd.addColorStop(0, "rgba(255, 0, 85, 0.8)"); topGrd.addColorStop(1, "rgba(150, 0, 50, 0.8)");
-                    ctx.fillStyle = topGrd; ctx.strokeStyle = "#ff0055"; ctx.shadowColor = "#ff0055";
-                    ctx.fillRect(p.x, 0, p.w, p.top); ctx.strokeRect(p.x, -5, p.w, p.top + 5);
-
-                    let botGrd = ctx.createLinearGradient(p.x, canvas.height - p.bottom, p.x + p.w, canvas.height);
-                    botGrd.addColorStop(0, "rgba(255, 0, 85, 0.8)"); botGrd.addColorStop(1, "rgba(150, 0, 50, 0.8)");
-                    ctx.fillStyle = botGrd; ctx.strokeStyle = "#ff0055"; ctx.shadowColor = "#ff0055";
-                    ctx.fillRect(p.x, canvas.height - p.bottom, p.w, p.bottom);
-                    ctx.strokeRect(p.x, canvas.height - p.bottom, p.w, p.bottom + 5);
-
-                    ctx.restore();
-                });
-
-                ctx.save();
-                ctx.translate(200, birdY);
-                let angle = Math.min(Math.max(-0.4, birdV / 12), 0.7);
-                ctx.rotate(angle);
-                
-                ctx.shadowBlur = 20; ctx.shadowColor = "#00ffcc";
-                ctx.fillStyle = "#00ffcc";
-                ctx.beginPath();
-                ctx.arc(0, 0, 14, 0, Math.PI*2);
-                ctx.fill();
-                
-                ctx.fillStyle = "#020212";
-                ctx.beginPath(); ctx.arc(6, -4, 3, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#fff"; ctx.fillRect(-8, -2, 10, 4);
-                ctx.restore();
-
-                postRenderFrame();
-            }
-
-            preRenderFrame();
-            postRenderFrame();
-        }
-
-        // ==========================================
-        // 4. 3D DICE 21 SYSTEM UPGRADE ENGINE
-        // ==========================================
-        function setupDice() {
-            let playerTotal, isRolling, currentRoll, messageText, gameActive;
-            let rollAngleX = 0, rollAngleY = 0, targetAngleX = 0, targetAngleY = 0;
-
-            const startBtn = document.getElementById('startBtn');
-            const actionBtn = document.getElementById('actionBtn');
-
-            gameInstance = {
-                start: function() {
-                    if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
-                    ctx = canvas.getContext('2d');
-                    
-                    playerTotal = 0; currentRoll = 1; isRolling = false; gameActive = true;
-                    messageText = "Roll initialization loop prepared.";
-                    startBtn.classList.add('hidden');
-                    actionBtn.classList.remove('hidden');
-                    actionBtn.textContent = "STICK SELECTION";
-                    
-                    rollDiceSequence();
-                    loop();
-                },
-                actionCallback: function() {
-                    if(!gameActive || isRolling) return;
-                    gameActive = false;
-                    evaluateFinalOutcome(true);
-                }
-            };
-
-            function rollDiceSequence() {
-                if(isRolling || !gameActive) return;
-                isRolling = true;
-                messageText = "Rolling physical matrix calculations...";
-                
-                let rollTicks = 0;
-                let maxTicks = 45;
-
-                function tickRoll() {
-                    rollAngleX += (Math.random() * 0.4 + 0.2);
-                    rollAngleY += (Math.random() * 0.4 + 0.2);
-                    
-                    rollTicks++;
-                    if(rollTicks < maxTicks) {
-                        setTimeout(tickRoll, 20);
-                    } else {
-                        currentRoll = Math.floor(Math.random() * 6) + 1;
-                        const faceRotations = {
-                            1: {x: 0, y: 0}, 6: {x: Math.PI, y: 0},
-                            2: {x: 0, y: Math.PI/2}, 5: {x: 0, y: -Math.PI/2},
-                            3: {x: -Math.PI/2, y: 0}, 4: {x: Math.PI/2, y: 0}
-                        };
-                        targetAngleX = faceRotations[currentRoll].x;
-                        targetAngleY = faceRotations[currentRoll].y;
-                        
-                        playerTotal += currentRoll;
-                        document.getElementById('gameScore').textContent = String(playerTotal).padStart(5, '0');
-                        applyScreenShake(12);
-                        createExplosion(canvas.width/2, canvas.height/2, '#b55fe6', 25);
-                        isRolling = false;
-
-                        evaluateFinalOutcome(false);
-                    }
-                }
-                tickRoll();
-            }
-
-            function evaluateFinalOutcome(forcedStick) {
-                if(playerTotal === 21) {
-                    messageText = "CRITICAL QUANTUM HIT: Exact calculation index reached!";
-                    endGameSequence();
-                } else if(playerTotal > 21) {
-                    messageText = "OVERLOAD FAILURE: Buffer threshold exceeded value 21.";
-                    endGameSequence();
-                } else {
-                    if(forcedStick) {
-                        if(playerTotal >= 17) messageText = `System analysis verified operational baseline execution at score: ${playerTotal}`;
-                        else messageText = `Failure logic baseline: Sticking too early beneath security limits at value: ${playerTotal}`;
-                        endGameSequence();
-                    } else {
-                        messageText = `Analyzed value: ${playerTotal}. Execute choice sequence options.`;
-                        canvas.onclick = rollDiceSequence;
-                    }
-                }
-            }
-
-            function endGameSequence() {
-                gameActive = false;
-                canvas.onclick = null;
-                actionBtn.classList.add('hidden');
-                startBtn.classList.remove('hidden');
-                startBtn.textContent = "REBOOT MATRIX DICE";
-            }
-
-            function loop() {
-                animationId = requestAnimationFrame(loop);
-                
-                if(!isRolling) {
-                    rollAngleX += (targetAngleX - rollAngleX) * 0.15;
-                    rollAngleY += (targetAngleY - rollAngleY) * 0.15;
-                }
-                render();
-            }
-
-            const vertices = [
-                {x:-1, y:-1, z: 1}, {x: 1, y:-1, z: 1}, {x: 1, y: 1, z: 1}, {x:-1, y: 1, z: 1},
-                {x:-1, y:-1, z:-1}, {x: 1, y:-1, z:-1}, {x: 1, y: 1, z:-1}, {x:-1, y: 1, z:-1}
-            ];
-            const faces = [
-                {verts:[0,1,2,3], dotColor:"#ff0055", label:1, dots:[{x:0,y:0}]}, 
-                {verts:[5,4,7,6], dotColor:"#00ffcc", label:6, dots:[{x:-0.5,y:-0.5},{x:0.5,y:-0.5},{x:-0.5,y:0},{x:0.5,y:0},{x:-0.5,y:0.5},{x:0.5,y:0.5}]}, 
-                {verts:[1,5,6,2], dotColor:"#0099ff", label:2, dots:[{x:-0.4,y:-0.4},{x:0.4,y:0.4}]}, 
-                {verts:[4,0,3,7], dotColor:"#ffaa00", label:5, dots:[{x:-0.4,y:-0.4},{x:0.4,y:-0.4},{x:0,y:0},{x:-0.4,y:0.4},{x:0.4,y:0.4}]}, 
-                {verts:[4,5,1,0], dotColor:"#ff00ff", label:3, dots:[{x:-0.4,y:-0.4},{x:0,y:0},{x:0.4,y:0.4}]}, 
-                {verts:[3,2,6,7], dotColor:"#00ff00", label:4, dots:[{x:-0.4,y:-0.4},{x:0.4,y:-0.4},{x:-0.4,y:0.4},{x:0.4,y:0.4}]}  
-            ];
-
-            function project3D(x, y, z) {
-                let radX = rollAngleX, radY = rollAngleY;
-                let x1 = x * Math.cos(radY) - z * Math.sin(radY);
-                let z1 = x * Math.sin(radY) + z * Math.cos(radY);
-                let y2 = y * Math.cos(radX) - z1 * Math.sin(radX);
-                let z2 = y * Math.sin(radX) + z1 * Math.cos(radX);
-                
-                let scaleFactor = 160 / (z2 + 4); 
-                return {
-                    x: canvas.width / 2 + x1 * scaleFactor,
-                    y: canvas.height / 2 - 40 + y2 * scaleFactor,
-                    z: z2
-                };
-            }
-
-            function render() {
-                preRenderFrame();
-
-                let renderedFaces = faces.map(f => {
-                    let pts = f.verts.map(v => project3D(vertices[v].x, vertices[v].y, vertices[v].z));
-                    let compVector1 = { x: pts[1].x - pts[0].x, y: pts[1].y - pts[0].y };
-                    let compVector2 = { x: pts[2].x - pts[0].x, y: pts[2].y - pts[0].y };
-                    let normalZ = compVector1.x * compVector2.y - compVector1.y * compVector2.x;
-                    return { face: f, points: pts, avgZ: pts.reduce((sum,p)=>sum+p.z, 0)/4, normalZ: normalZ };
-                });
-
-                renderedFaces.sort((a,b) => b.avgZ - a.avgZ);
-
-                renderedFaces.forEach(rf => {
-                    if(rf.normalZ < 0) return; 
-
-                    ctx.save();
-                    ctx.fillStyle = "rgba(18, 10, 43, 0.95)";
-                    ctx.strokeStyle = "#b55fe6";
-                    ctx.lineWidth = 3;
-                    ctx.shadowBlur = 20; ctx.shadowColor = "#b55fe6";
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(rf.points[0].x, rf.points[0].y);
-                    for(let i=1; i<4; i++) ctx.lineTo(rf.points[i].x, rf.points[i].y);
-                    ctx.closePath();
-                    ctx.fill(); ctx.stroke();
-
-                    let cx = rf.points.reduce((s,p)=>s+p.x,0)/4;
-                    let cy = rf.points.reduce((s,p)=>s+p.y,0)/4;
-
-                    rf.face.dots.forEach(d => {
-                        let dx = d.x * (rf.points[1].x - rf.points[0].x) + d.y * (rf.points[3].x - rf.points[0].x);
-                        let dy = d.x * (rf.points[1].y - rf.points[0].y) + d.y * (rf.points[3].y - rf.points[0].y);
-                        
-                        ctx.fillStyle = rf.face.dotColor;
-                        ctx.shadowBlur = 8; ctx.shadowColor = rf.face.dotColor;
-                        ctx.beginPath();
-                        ctx.arc(cx + dx, cy + dy, 6, 0, Math.PI*2);
-                        ctx.fill();
-                    });
-                    ctx.restore();
-                });
-
-                ctx.fillStyle = gameActive ? "#00ffcc" : "#ff0055";
-                ctx.font = "bold 20px 'Orbitron'";
-                ctx.textBaseline = "middle"; ctx.textAlign = "center";
-                ctx.fillText(messageText, canvas.width/2, canvas.height - 50);
-
-                if(gameActive && !isRolling) {
-                    ctx.fillStyle = "rgba(255,255,255,0.3)";
-                    ctx.font = "12px 'Outfit'";
-                    ctx.fillText("[ CLICK CANVAS WRAPPER TO DISCHARGE NEXT VALUE MODULE ]", canvas.width/2, canvas.height - 20);
-                }
-
-                postRenderFrame();
-            }
-
-            preRenderFrame();
-            postRenderFrame();
-        }
-
-        // ==========================================
-        // 5. QUANTUM CLICKER SYSTEM UPGRADE ENGINE
-        // ==========================================
-        function setupClicker() {
-            let score, isRunning, gameSpeed, targets, clickCounter, targetSize;
-            const maxTargets = 5;
-
-            function spawnTarget() {
-                return {
-                    x: Math.random() * (canvas.width - 80) + 40,
-                    y: Math.random() * (canvas.height - 80) + 40,
-                    radius: 40,
-                    health: 1,
-                    color: ['#ff0055', '#00ffcc', '#0099ff', '#ffaa00'][Math.floor(Math.random() * 4)]
-                };
-            }
-
-            gameInstance = {
-                start: function() {
-                    if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
-                    ctx = canvas.getContext('2d');
-                    
-                    score = 0; isRunning = true; gameSpeed = 1; targets = []; clickCounter = 0; targetSize = 40;
-                    for(let i = 0; i < 3; i++) targets.push(spawnTarget());
-                    document.getElementById('startBtn').classList.add('hidden');
-                    document.getElementById('gameScore').textContent = "00000";
-                    canvas.onclick = handleCanvasClick;
-                    loop();
-                }
-            };
-
-            function handleCanvasClick(e) {
-                const rect = canvas.getBoundingClientRect();
-                const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-                const my = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-                for(let i = targets.length - 1; i >= 0; i--) {
-                    let t = targets[i];
-                    let dist = Math.hypot(mx - t.x, my - t.y);
-                    if(dist < t.radius) {
-                        clickCounter++;
-                        score += 100 * gameSpeed;
-                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                        createExplosion(t.x, t.y, t.color, 15);
-                        applyScreenShake(3);
-                        targets.splice(i, 1);
-                        if(clickCounter % 5 === 0) { gameSpeed += 0.2; }
-                        break;
-                    }
-                }
-            }
-
-            function loop() {
-                if(!isRunning) return;
-                animationId = requestAnimationFrame(loop);
-
-                if(targets.length < maxTargets && Math.random() > 0.7) targets.push(spawnTarget());
-
-                targets.forEach(t => {
-                    t.x += (Math.random() - 0.5) * 2;
-                    t.y += (Math.random() - 0.5) * 2;
-                    t.x = Math.max(t.radius, Math.min(canvas.width - t.radius, t.x));
-                    t.y = Math.max(t.radius, Math.min(canvas.height - t.radius, t.y));
-                });
-
-                render();
-            }
-
-            function render() {
-                preRenderFrame();
-
-                targets.forEach(t => {
-                    ctx.save();
-                    ctx.shadowBlur = 20; ctx.shadowColor = t.color;
-                    ctx.fillStyle = t.color;
-                    ctx.beginPath();
-                    ctx.arc(t.x, t.y, t.radius, 0, Math.PI*2);
-                    ctx.fill();
-
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    ctx.restore();
-                });
-
-                postRenderFrame();
-            }
-
-            preRenderFrame();
-            postRenderFrame();
-        }
-
-        // ==========================================
-        // 6. PONG LOGIC PROTOCOL ENGINE
-        // ==========================================
-        function setupPong() {
-            let ballX, ballY, ballVX, ballVY, ballRadius, paddleY, computerPaddleY, score, isRunning;
-            const paddleWidth = 12, paddleHeight = 80, ballSpeed = 4;
-
-            gameInstance = {
-                start: function() {
-                    if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
-                    ctx = canvas.getContext('2d');
-                    
-                    ballX = canvas.width / 2;
-                    ballY = canvas.height / 2;
-                    ballVX = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
-                    ballVY = ballSpeed * (Math.random() - 0.5);
-                    ballRadius = 6;
-                    paddleY = canvas.height / 2 - paddleHeight / 2;
-                    computerPaddleY = canvas.height / 2 - paddleHeight / 2;
-                    score = 0;
-                    isRunning = true;
-                    document.getElementById('startBtn').classList.add('hidden');
-                    document.getElementById('gameScore').textContent = "00000";
-                    loop();
-                }
-            };
-
-            function loop() {
-                if(!isRunning) return;
-                animationId = requestAnimationFrame(loop);
-
-                // Player paddle movement
-                if((keys['ArrowUp'] || keys['w']) && paddleY > 0) paddleY -= 6;
-                if((keys['ArrowDown'] || keys['s']) && paddleY < canvas.height - paddleHeight) paddleY += 6;
-
-                // Ball movement
-                ballX += ballVX;
-                ballY += ballVY;
-
-                // Ball collision with top/bottom
-                if(ballY - ballRadius < 0 || ballY + ballRadius > canvas.height) {
-                    ballVY *= -1;
-                    ballY = Math.max(ballRadius, Math.min(canvas.height - ballRadius, ballY));
-                }
-
-                // Ball collision with paddles
-                if(ballX - ballRadius < 20 && ballY > paddleY && ballY < paddleY + paddleHeight) {
-                    ballVX = Math.abs(ballVX);
-                    applyScreenShake(5);
-                    createExplosion(ballX, ballY, '#00ffcc', 10);
-                }
-                if(ballX + ballRadius > canvas.width - 20 && ballY > computerPaddleY && ballY < computerPaddleY + paddleHeight) {
-                    ballVX = -Math.abs(ballVX);
-                    applyScreenShake(5);
-                    createExplosion(ballX, ballY, '#ff0055', 10);
-                }
-
-                // AI paddle movement
-                let computerCenter = computerPaddleY + paddleHeight / 2;
-                if(computerCenter < ballY - 35) computerPaddleY += 5;
-                if(computerCenter > ballY + 35) computerPaddleY -= 5;
-                computerPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, computerPaddleY));
-
-                // Scoring
-                if(ballX < 0) {
-                    score += 100;
-                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                    ballX = canvas.width / 2;
-                    ballY = canvas.height / 2;
-                    ballVX = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
-                    ballVY = ballSpeed * (Math.random() - 0.5);
-                    createExplosion(canvas.width / 2, canvas.height / 2, '#00ff00', 20);
-                }
-                if(ballX > canvas.width) {
-                    if(score > 0) score -= 50;
-                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                    ballX = canvas.width / 2;
-                    ballY = canvas.height / 2;
-                    ballVX = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
-                    ballVY = ballSpeed * (Math.random() - 0.5);
-                    createExplosion(canvas.width / 2, canvas.height / 2, '#ff0055', 20);
-                }
-
-                render();
-            }
-
-            function render() {
-                preRenderFrame();
-
-                // Draw paddles
-                ctx.fillStyle = '#00ffcc';
-                ctx.shadowBlur = 15; ctx.shadowColor = '#00ffcc';
-                ctx.fillRect(10, paddleY, paddleWidth, paddleHeight);
-
-                ctx.fillStyle = '#ff0055';
-                ctx.shadowColor = '#ff0055';
-                ctx.fillRect(canvas.width - 22, computerPaddleY, paddleWidth, paddleHeight);
-
-                // Draw ball
-                ctx.fillStyle = '#0099ff';
-                ctx.shadowColor = '#0099ff';
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
-                ctx.fill();
 
                 postRenderFrame();
             }

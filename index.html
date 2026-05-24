@@ -138,12 +138,14 @@
             opacity: 1;
         }
 
-        #gameCanvas {
+        canvas {
             background: #04010a;
             border: 2px solid #00ffcc;
             box-shadow: 0 0 40px rgba(0, 255, 204, 0.15);
             image-rendering: pixelated;
             image-rendering: crisp-edges;
+            display: block;
+            margin: 0 auto;
         }
 
         #emuContainer {
@@ -181,6 +183,17 @@
         .mode-button:hover {
             border-color: #00ffcc;
             box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+        }
+
+        .game-canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            overflow: auto;
         }
     </style>
 </head>
@@ -315,9 +328,8 @@
                 <button class="mode-button" onclick="setPongMode('2player')">2 PLAYER</button>
             </div>
 
-            <div class="relative overflow-hidden rounded-xl bg-black flex justify-center items-center min-h-96" id="gameCanvasContainer">
-                <canvas id="gameCanvas" width="800" height="450" class="max-w-full h-auto" style="display: none;"></canvas>
-                <div id="emuContainer" style="display: none;"></div>
+            <div class="game-canvas-container" id="gameCanvasContainer">
+                <div id="emuContainer" style="display: none; width: 100%; height: 450px;"></div>
             </div>
 
             <div class="flex flex-wrap justify-center gap-4 mt-6">
@@ -421,12 +433,14 @@
             delete window.EJS_pathtodata;
             delete window.EJS_color;
             
-            if (canvas) {
-                canvas.onclick = null;
-                canvas.oncontextmenu = null;
-                canvas.onmousemove = null;
-                canvas.style.display = 'none';
+            // Remove all canvases
+            const container = document.getElementById('gameCanvasContainer');
+            if (container) {
+                const canvases = container.querySelectorAll('canvas');
+                canvases.forEach(c => c.remove());
             }
+            
+            canvas = null;
             ctx = null;
             currentGame = null;
 
@@ -439,20 +453,12 @@
             document.getElementById('games-section').classList.remove('active');
             document.getElementById('game-container').classList.add('active');
             currentGame = gameName;
-            
-            if(gameName === 'smb') {
-                initializeGameModule(gameName);
-            } else {
-                canvas = document.getElementById('gameCanvas');
-                ctx = canvas.getContext('2d');
-                particles = []; shakeIntensity = 0;
-                initializeGameModule(gameName);
-            }
+            initializeGameModule(gameName);
         }
 
         // Render Structural Background Grid Vector
         function drawVectorGrid() {
-            if (!ctx) return;
+            if (!ctx || !canvas) return;
             ctx.strokeStyle = "rgba(0, 255, 204, 0.03)";
             ctx.lineWidth = 1;
             let gridSize = 30;
@@ -462,7 +468,7 @@
 
         // Context Matrix Transformation Calculations for Shake effects
         function preRenderFrame() {
-            if (!ctx) return;
+            if (!ctx || !canvas) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
             if(shakeIntensity > 0) {
@@ -488,18 +494,17 @@
             const title = document.getElementById('gameTitle');
             const instructions = document.getElementById('gameInstructions');
             const modeSelector = document.getElementById('modeSelector');
+            const container = document.getElementById('gameCanvasContainer');
             
             if (animationId) cancelAnimationFrame(animationId);
+            
+            // Clear old canvases
+            container.querySelectorAll('canvas').forEach(c => c.remove());
+            
             actionBtn.classList.add('hidden');
             startBtn.classList.remove('hidden');
             startBtn.textContent = "INITIALIZE INSTANCE";
             document.getElementById('gameScore').textContent = "00000";
-
-            if(name !== 'smb') {
-                canvas.onclick = null;
-                canvas.oncontextmenu = null;
-                canvas.onmousemove = null;
-            }
 
             modeSelector.classList.add('hidden');
 
@@ -554,14 +559,13 @@
         // 0. SUPER MARIO BROS EMULATOR ENGINE
         // ==========================================
         function setupSMB() {
-            const canvasEl = document.getElementById('gameCanvas');
             const emuContainer = document.getElementById('emuContainer');
             const startBtn = document.getElementById('startBtn');
+            const container = document.getElementById('gameCanvasContainer');
 
             gameInstance = {
                 start: function() {
                     startBtn.classList.add('hidden');
-                    canvasEl.style.display = 'none';
                     emuContainer.style.display = 'block';
                     emuContainer.innerHTML = '';
 
@@ -578,9 +582,6 @@
                     document.body.appendChild(script);
                 }
             };
-
-            canvasEl.style.display = 'none';
-            emuContainer.style.display = 'none';
         }
 
         // ==========================================
@@ -589,21 +590,25 @@
         function setupSnake() {
             let snake, food, dir, nextDir, score, isRunning, stepCounter, gameSpeed;
             const grid = 15;
+            const canvasW = 800, canvasH = 450;
 
             function spawnFood() {
                 food = {
-                    x: Math.floor(Math.random() * (canvas.width / grid)) * grid,
-                    y: Math.floor(Math.random() * (canvas.height / grid)) * grid
+                    x: Math.floor(Math.random() * (canvasW / grid)) * grid,
+                    y: Math.floor(Math.random() * (canvasH / grid)) * grid
                 };
             }
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
+                    const container = document.getElementById('gameCanvasContainer');
+                    container.innerHTML = '';
+                    
+                    canvas = document.createElement('canvas');
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    container.appendChild(canvas);
                     ctx = canvas.getContext('2d');
                     
                     snake = [{x: 120, y: 120}, {x: 105, y: 120}, {x: 90, y: 120}];
@@ -635,7 +640,7 @@
                 dir = nextDir;
                 let head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
 
-                if(head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                if(head.x < 0 || head.x >= canvasW || head.y < 0 || head.y >= canvasH) {
                     gameOver(); return;
                 }
                 for(let seg of snake) {
@@ -699,8 +704,9 @@
             const cols = 4, rows = 4;
             const w = 90, h = 90;
             const gap = 20;
-            const startX = (800 - (cols * (w + gap))) / 2;
-            const startY = (450 - (rows * (h + gap))) / 2;
+            const canvasW = 800, canvasH = 450;
+            const startX = (canvasW - (cols * (w + gap))) / 2;
+            const startY = (canvasH - (rows * (h + gap))) / 2;
 
             function initGrid() {
                 let pool = [...symbols, ...symbols];
@@ -724,10 +730,13 @@
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
+                    const container = document.getElementById('gameCanvasContainer');
+                    container.innerHTML = '';
+                    
+                    canvas = document.createElement('canvas');
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    container.appendChild(canvas);
                     ctx = canvas.getContext('2d');
                     
                     initGrid();
@@ -742,8 +751,10 @@
             function handleCanvasClick(e) {
                 if(!canClick) return;
                 const rect = canvas.getBoundingClientRect();
-                const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
-                const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const mx = (e.clientX - rect.left) * scaleX;
+                const my = (e.clientY - rect.top) * scaleY;
 
                 for(let card of cards) {
                     if(!card.flipped && !card.matched && mx > card.x && mx < card.x + w && my > card.y && my < card.y + h) {
@@ -830,7 +841,7 @@
                     ctx.fillStyle = "#00ffcc";
                     ctx.font = "40px Orbitron";
                     ctx.textAlign = "center";
-                    ctx.fillText("MATRIX INTEGRITY RECONSTRUCTED", canvas.width/2, canvas.height/2);
+                    ctx.fillText("MATRIX INTEGRITY RECONSTRUCTED", canvasW/2, canvasH/2);
                 }
 
                 postRenderFrame();
@@ -847,19 +858,23 @@
             let paddle1, paddle2, ball, score1, score2, isRunning;
             const paddleW = 12, paddleH = 80;
             const ballSize = 6;
+            const canvasW = 800, canvasH = 450;
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
+                    const container = document.getElementById('gameCanvasContainer');
+                    container.innerHTML = '';
+                    
+                    canvas = document.createElement('canvas');
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    container.appendChild(canvas);
                     ctx = canvas.getContext('2d');
 
-                    paddle1 = { x: 20, y: canvas.height/2 - paddleH/2, width: paddleW, height: paddleH, dy: 0 };
-                    paddle2 = { x: canvas.width - 20 - paddleW, y: canvas.height/2 - paddleH/2, width: paddleW, height: paddleH, dy: 0 };
-                    ball = { x: canvas.width/2, y: canvas.height/2, vx: 5, vy: 5, size: ballSize };
+                    paddle1 = { x: 20, y: canvasH/2 - paddleH/2, width: paddleW, height: paddleH, dy: 0 };
+                    paddle2 = { x: canvasW - 20 - paddleW, y: canvasH/2 - paddleH/2, width: paddleW, height: paddleH, dy: 0 };
+                    ball = { x: canvasW/2, y: canvasH/2, vx: 5, vy: 5, size: ballSize };
                     score1 = 0; score2 = 0;
                     isRunning = true;
                     document.getElementById('startBtn').classList.add('hidden');
@@ -888,14 +903,14 @@
                 paddle1.y += paddle1.dy;
                 paddle2.y += paddle2.dy;
                 if(paddle1.y < 0) paddle1.y = 0;
-                if(paddle1.y + paddleH > canvas.height) paddle1.y = canvas.height - paddleH;
+                if(paddle1.y + paddleH > canvasH) paddle1.y = canvasH - paddleH;
                 if(paddle2.y < 0) paddle2.y = 0;
-                if(paddle2.y + paddleH > canvas.height) paddle2.y = canvas.height - paddleH;
+                if(paddle2.y + paddleH > canvasH) paddle2.y = canvasH - paddleH;
 
                 ball.x += ball.vx;
                 ball.y += ball.vy;
 
-                if(ball.y - ball.size < 0 || ball.y + ball.size > canvas.height) ball.vy *= -1;
+                if(ball.y - ball.size < 0 || ball.y + ball.size > canvasH) ball.vy *= -1;
 
                 if(ball.x - ball.size < paddle1.x + paddleW && ball.y > paddle1.y && ball.y < paddle1.y + paddleH) {
                     ball.vx = Math.abs(ball.vx) + 1;
@@ -916,12 +931,12 @@
                 if(ball.x < -10) {
                     score2++;
                     document.getElementById('gameScore').textContent = String(score2).padStart(5, '0');
-                    ball = { x: canvas.width/2, y: canvas.height/2, vx: 5, vy: 5, size: ballSize };
+                    ball = { x: canvasW/2, y: canvasH/2, vx: 5, vy: 5, size: ballSize };
                 }
-                if(ball.x > canvas.width + 10) {
+                if(ball.x > canvasW + 10) {
                     score1++;
                     document.getElementById('gameScore').textContent = String(score1).padStart(5, '0');
-                    ball = { x: canvas.width/2, y: canvas.height/2, vx: -5, vy: 5, size: ballSize };
+                    ball = { x: canvasW/2, y: canvasH/2, vx: -5, vy: 5, size: ballSize };
                 }
 
                 render();
@@ -960,8 +975,8 @@
         function setupTetris() {
             let grid, currentPiece, nextPiece, score, isRunning, dropCounter, dropSpeed;
             const gridW = 10, gridH = 20, cellSize = 20;
-            const canvasWidth = gridW * cellSize;
-            const canvasHeight = gridH * cellSize;
+            const canvasW = gridW * cellSize + 40;
+            const canvasH = gridH * cellSize + 40;
             const tetriminos = [
                 [[1,1,1,1]], // I
                 [[1,1],[1,1]], // O
@@ -1006,37 +1021,51 @@
                 return true;
             }
 
-            function placePiece(piece) {
+            function rotatePiece(piece) {
+                const len = piece.shape.length;
+                const rotated = [];
+                for(let i = 0; i < len; i++) {
+                    rotated[i] = [];
+                    for(let j = 0; j < piece.shape[i].length; j++) {
+                        rotated[i][j] = piece.shape[len - 1 - j][i];
+                    }
+                }
+                return rotated;
+            }
+
+            function lockPiece(piece) {
                 for(let i = 0; i < piece.shape.length; i++) {
                     for(let j = 0; j < piece.shape[i].length; j++) {
-                        if(piece.shape[i][j]) {
-                            let ny = piece.y + i;
-                            if(ny >= 0) grid[ny][piece.x + j] = piece.color;
+                        if(piece.shape[i][j] && piece.y + i >= 0) {
+                            grid[piece.y + i][piece.x + j] = piece.color;
                         }
                     }
                 }
+                checkLines();
             }
 
-            function clearLines() {
-                let cleared = 0;
+            function checkLines() {
                 for(let i = gridH - 1; i >= 0; i--) {
                     if(grid[i].every(cell => cell !== 0)) {
                         grid.splice(i, 1);
-                        grid.unshift(new Array(gridW).fill(0));
-                        cleared++;
-                        createExplosion(canvasWidth/2, i * cellSize, '#00ffcc', 20);
+                        grid.unshift(Array(gridW).fill(0));
+                        score += 100;
+                        applyScreenShake(5);
+                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
                     }
                 }
-                return cleared;
             }
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
+                    const container = document.getElementById('gameCanvasContainer');
+                    container.innerHTML = '';
+                    
+                    canvas = document.createElement('canvas');
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    container.appendChild(canvas);
                     ctx = canvas.getContext('2d');
 
                     initGrid();
@@ -1046,6 +1075,9 @@
                     dropCounter = 0;
                     dropSpeed = 30;
                     document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('gameScore').textContent = "00000";
+                    
+                    canvas.onkeydown = null;
                     loop();
                 }
             };
@@ -1054,34 +1086,34 @@
                 if(!isRunning) return;
                 animationId = requestAnimationFrame(loop);
 
-                if(keys[' '] || keys['ArrowUp']) {
-                    let rotated = JSON.parse(JSON.stringify(currentPiece));
-                    rotated.shape = rotated.shape[0].map((_, i) => rotated.shape.map(row => row[i])).reverse();
-                    if(canPlace(rotated, rotated.x, rotated.y)) currentPiece = rotated;
+                if((keys['ArrowLeft'] || keys['a']) && canPlace(currentPiece, currentPiece.x - 1, currentPiece.y)) {
+                    currentPiece.x--;
+                }
+                if((keys['ArrowRight'] || keys['d']) && canPlace(currentPiece, currentPiece.x + 1, currentPiece.y)) {
+                    currentPiece.x++;
+                }
+                if(keys[' ']) {
+                    let rotated = { ...currentPiece, shape: rotatePiece(currentPiece) };
+                    if(canPlace(rotated, rotated.x, rotated.y)) {
+                        currentPiece.shape = rotated.shape;
+                    }
                     keys[' '] = false;
-                    keys['ArrowUp'] = false;
                 }
 
-                if(keys['ArrowLeft'] && canPlace(currentPiece, currentPiece.x - 1, currentPiece.y)) currentPiece.x--;
-                if(keys['ArrowRight'] && canPlace(currentPiece, currentPiece.x + 1, currentPiece.y)) currentPiece.x++;
+                let dropAmount = (keys['ArrowDown'] || keys['s']) ? 2 : 1;
+                dropCounter += dropAmount;
 
-                dropCounter++;
-                let dropRate = keys['ArrowDown'] ? 2 : dropSpeed;
-                if(dropCounter > dropRate) {
+                if(dropCounter >= dropSpeed) {
                     dropCounter = 0;
                     if(canPlace(currentPiece, currentPiece.x, currentPiece.y + 1)) {
                         currentPiece.y++;
                     } else {
-                        placePiece(currentPiece);
-                        let cleared = clearLines();
-                        score += cleared * 100;
-                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        lockPiece(currentPiece);
                         currentPiece = getNewPiece();
                         if(!canPlace(currentPiece, currentPiece.x, currentPiece.y)) {
                             isRunning = false;
-                            applyScreenShake(20);
                             document.getElementById('startBtn').classList.remove('hidden');
-                            document.getElementById('startBtn').textContent = "RESTART TETRIS";
+                            document.getElementById('startBtn').textContent = "REBOOT TETRIS";
                         }
                     }
                 }
@@ -1090,152 +1122,115 @@
             }
 
             function render() {
-                ctx.fillStyle = "#04010a";
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-                ctx.strokeStyle = "rgba(0, 255, 204, 0.2)";
-                ctx.lineWidth = 1;
+                preRenderFrame();
 
+                const offsetX = 20, offsetY = 20;
+
+                // Draw grid
                 for(let i = 0; i < gridH; i++) {
                     for(let j = 0; j < gridW; j++) {
                         if(grid[i][j]) {
                             ctx.fillStyle = grid[i][j];
                             ctx.shadowColor = grid[i][j];
                             ctx.shadowBlur = 8;
-                            ctx.fillRect(j * cellSize, i * cellSize, cellSize - 1, cellSize - 1);
-                        }
-                        ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
-                    }
-                }
-
-                for(let i = 0; i < currentPiece.shape.length; i++) {
-                    for(let j = 0; j < currentPiece.shape[i].length; j++) {
-                        if(currentPiece.shape[i][j]) {
-                            let x = currentPiece.x + j;
-                            let y = currentPiece.y + i;
-                            ctx.fillStyle = currentPiece.color;
-                            ctx.shadowColor = currentPiece.color;
-                            ctx.shadowBlur = 10;
-                            ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+                            ctx.fillRect(offsetX + j * cellSize, offsetY + i * cellSize, cellSize - 1, cellSize - 1);
                         }
                     }
                 }
 
-                updateAndRenderParticles();
+                // Draw current piece
+                if(currentPiece) {
+                    ctx.fillStyle = currentPiece.color;
+                    ctx.shadowColor = currentPiece.color;
+                    ctx.shadowBlur = 12;
+                    for(let i = 0; i < currentPiece.shape.length; i++) {
+                        for(let j = 0; j < currentPiece.shape[i].length; j++) {
+                            if(currentPiece.shape[i][j]) {
+                                let px = offsetX + (currentPiece.x + j) * cellSize;
+                                let py = offsetY + (currentPiece.y + i) * cellSize;
+                                ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
+                            }
+                        }
+                    }
+                }
+
+                postRenderFrame();
             }
+
+            preRenderFrame();
+            postRenderFrame();
         }
 
         // ==========================================
-        // 5. MINESWEEPER PROTOCOLS ENGINE
+        // 5. MINESWEEPER ENGINE
         // ==========================================
         function setupMinesweeper() {
             let grid, revealed, flagged, score, isRunning, gameOver;
-            const gridW = 10, gridH = 10, cellSize = 40;
-            const mineCount = 15;
+            const cols = 8, rows = 8, mines = 10;
+            const cellSize = 40;
+            const canvasW = cols * cellSize, canvasH = rows * cellSize;
 
             function initGrid() {
-                grid = [];
-                revealed = [];
-                flagged = [];
-                for(let i = 0; i < gridH; i++) {
-                    grid[i] = [];
-                    revealed[i] = [];
-                    flagged[i] = [];
-                    for(let j = 0; j < gridW; j++) {
-                        grid[i][j] = 0;
-                        revealed[i][j] = false;
-                        flagged[i][j] = false;
+                grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
+                
+                let minesPlaced = 0;
+                while(minesPlaced < mines) {
+                    let r = Math.floor(Math.random() * rows);
+                    let c = Math.floor(Math.random() * cols);
+                    if(grid[r][c] !== 'M') {
+                        grid[r][c] = 'M';
+                        minesPlaced++;
                     }
                 }
 
-                let placed = 0;
-                while(placed < mineCount) {
-                    let x = Math.floor(Math.random() * gridW);
-                    let y = Math.floor(Math.random() * gridH);
-                    if(grid[y][x] !== 'M') {
-                        grid[y][x] = 'M';
-                        placed++;
-                    }
-                }
-
-                for(let i = 0; i < gridH; i++) {
-                    for(let j = 0; j < gridW; j++) {
+                for(let i = 0; i < rows; i++) {
+                    for(let j = 0; j < cols; j++) {
                         if(grid[i][j] !== 'M') {
                             let count = 0;
                             for(let di = -1; di <= 1; di++) {
                                 for(let dj = -1; dj <= 1; dj++) {
                                     let ni = i + di, nj = j + dj;
-                                    if(ni >= 0 && ni < gridH && nj >= 0 && nj < gridW && grid[ni][nj] === 'M') count++;
+                                    if(ni >= 0 && ni < rows && nj >= 0 && nj < cols && grid[ni][nj] === 'M') count++;
                                 }
                             }
                             grid[i][j] = count;
                         }
                     }
                 }
+
+                revealed = Array(rows).fill(null).map(() => Array(cols).fill(false));
+                flagged = Array(rows).fill(null).map(() => Array(cols).fill(false));
             }
 
-            function revealCell(x, y) {
-                if(x < 0 || x >= gridW || y < 0 || y >= gridH || revealed[y][x] || flagged[y][x]) return;
-                revealed[y][x] = true;
-
-                if(grid[y][x] === 'M') {
-                    gameOverFn();
-                    return;
-                }
-
-                if(grid[y][x] === 0) {
+            function revealCell(r, c) {
+                if(r < 0 || r >= rows || c < 0 || c >= cols || revealed[r][c] || flagged[r][c]) return;
+                
+                revealed[r][c] = true;
+                
+                if(grid[r][c] === 'M') {
+                    gameOver = true;
+                    isRunning = false;
+                    applyScreenShake(20);
+                    createExplosion(c * cellSize + cellSize/2, r * cellSize + cellSize/2, '#ff0055', 30);
+                } else if(grid[r][c] === 0) {
                     for(let di = -1; di <= 1; di++) {
                         for(let dj = -1; dj <= 1; dj++) {
-                            revealCell(x + dj, y + di);
+                            revealCell(r + di, c + dj);
                         }
                     }
                 }
-
-                checkWin();
-            }
-
-            function toggleFlag(x, y) {
-                if(!revealed[y][x]) flagged[y][x] = !flagged[y][x];
-            }
-
-            function checkWin() {
-                let allRevealed = true;
-                for(let i = 0; i < gridH && allRevealed; i++) {
-                    for(let j = 0; j < gridW && allRevealed; j++) {
-                        if(grid[i][j] !== 'M' && !revealed[i][j]) allRevealed = false;
-                    }
-                }
-                if(allRevealed) {
-                    score += 500;
-                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                    applyScreenShake(10);
-                    createExplosion(canvas.width/2, canvas.height/2, '#00ffcc', 40);
-                    isRunning = false;
-                    gameOver = true;
-                    document.getElementById('startBtn').classList.remove('hidden');
-                    document.getElementById('startBtn').textContent = "NEW GAME";
-                }
-            }
-
-            function gameOverFn() {
-                isRunning = false;
-                gameOver = true;
-                applyScreenShake(25);
-                for(let i = 0; i < gridH; i++) {
-                    for(let j = 0; j < gridW; j++) {
-                        if(grid[i][j] === 'M') revealed[i][j] = true;
-                    }
-                }
-                document.getElementById('startBtn').classList.remove('hidden');
-                document.getElementById('startBtn').textContent = "RESTART GAME";
             }
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
+                    const container = document.getElementById('gameCanvasContainer');
+                    container.innerHTML = '';
+                    
+                    canvas = document.createElement('canvas');
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    container.appendChild(canvas);
                     ctx = canvas.getContext('2d');
 
                     initGrid();
@@ -1244,26 +1239,36 @@
                     gameOver = false;
                     document.getElementById('startBtn').classList.add('hidden');
                     document.getElementById('gameScore').textContent = "00000";
-                    canvas.onclick = function(e) {
-                        if(!isRunning) return;
+                    
+                    canvas.onclick = (e) => {
                         const rect = canvas.getBoundingClientRect();
-                        const x = Math.floor((e.clientX - rect.left) / cellSize);
-                        const y = Math.floor((e.clientY - rect.top) / cellSize);
-                        if(x >= 0 && x < gridW && y >= 0 && y < gridH) {
-                            revealCell(x, y);
-                            createExplosion(e.clientX - rect.left, e.clientY - rect.top, '#0099ff', 8);
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        const x = (e.clientX - rect.left) * scaleX;
+                        const y = (e.clientY - rect.top) * scaleY;
+                        const c = Math.floor(x / cellSize);
+                        const r = Math.floor(y / cellSize);
+                        
+                        if(r >= 0 && r < rows && c >= 0 && c < cols && isRunning) {
+                            revealCell(r, c);
                         }
                     };
-                    canvas.oncontextmenu = function(e) {
+                    
+                    canvas.oncontextmenu = (e) => {
                         e.preventDefault();
-                        if(!isRunning) return;
                         const rect = canvas.getBoundingClientRect();
-                        const x = Math.floor((e.clientX - rect.left) / cellSize);
-                        const y = Math.floor((e.clientY - rect.top) / cellSize);
-                        if(x >= 0 && x < gridW && y >= 0 && y < gridH) {
-                            toggleFlag(x, y);
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        const x = (e.clientX - rect.left) * scaleX;
+                        const y = (e.clientY - rect.top) * scaleY;
+                        const c = Math.floor(x / cellSize);
+                        const r = Math.floor(y / cellSize);
+                        
+                        if(r >= 0 && r < rows && c >= 0 && c < cols && !revealed[r][c]) {
+                            flagged[r][c] = !flagged[r][c];
                         }
                     };
+                    
                     loop();
                 }
             };
@@ -1271,223 +1276,188 @@
             function loop() {
                 animationId = requestAnimationFrame(loop);
                 render();
+                
+                if(isRunning) {
+                    let allRevealed = true;
+                    for(let i = 0; i < rows; i++) {
+                        for(let j = 0; j < cols; j++) {
+                            if(grid[i][j] !== 'M' && !revealed[i][j]) allRevealed = false;
+                        }
+                    }
+                    if(allRevealed) {
+                        isRunning = false;
+                        score = 1000;
+                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        applyScreenShake(10);
+                        createExplosion(canvasW/2, canvasH/2, '#00ffcc', 50);
+                        document.getElementById('startBtn').classList.remove('hidden');
+                        document.getElementById('startBtn').textContent = "REPLAY MINESWEEPER";
+                    }
+                }
             }
 
             function render() {
-                ctx.fillStyle = "#04010a";
-                ctx.fillRect(0, 0, gridW * cellSize, gridH * cellSize);
+                preRenderFrame();
 
-                for(let i = 0; i < gridH; i++) {
-                    for(let j = 0; j < gridW; j++) {
-                        let x = j * cellSize, y = i * cellSize;
-
-                        if(!revealed[i][j]) {
-                            ctx.fillStyle = "rgba(0, 150, 255, 0.3)";
-                            ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
-                            ctx.strokeStyle = "rgba(0, 255, 204, 0.5)";
-                            ctx.lineWidth = 2;
-                            ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
-
-                            if(flagged[i][j]) {
-                                ctx.fillStyle = "#ffff00";
-                                ctx.font = "bold 20px Arial";
-                                ctx.textAlign = "center";
-                                ctx.textBaseline = "middle";
-                                ctx.fillText("🚩", x + cellSize/2, y + cellSize/2);
-                            }
-                        } else {
-                            ctx.fillStyle = "rgba(0, 255, 204, 0.05)";
+                for(let i = 0; i < rows; i++) {
+                    for(let j = 0; j < cols; j++) {
+                        const x = j * cellSize;
+                        const y = i * cellSize;
+                        
+                        if(revealed[i][j]) {
+                            ctx.fillStyle = "rgba(0, 255, 204, 0.1)";
                             ctx.fillRect(x, y, cellSize, cellSize);
-                            ctx.strokeStyle = "rgba(0, 255, 204, 0.2)";
-                            ctx.lineWidth = 1;
-                            ctx.strokeRect(x, y, cellSize, cellSize);
-
+                            
                             if(grid[i][j] === 'M') {
                                 ctx.fillStyle = "#ff0055";
-                                ctx.font = "bold 24px Arial";
+                                ctx.shadowColor = "#ff0055";
+                                ctx.shadowBlur = 10;
+                                ctx.font = "24px Arial";
                                 ctx.textAlign = "center";
                                 ctx.textBaseline = "middle";
-                                ctx.fillText("💣", x + cellSize/2, y + cellSize/2);
+                                ctx.fillText('💣', x + cellSize/2, y + cellSize/2);
                             } else if(grid[i][j] > 0) {
-                                ctx.fillStyle = "#00ffcc";
-                                ctx.font = "bold 20px Orbitron";
+                                ctx.fillStyle = "#ffff00";
+                                ctx.font = "20px Arial";
                                 ctx.textAlign = "center";
                                 ctx.textBaseline = "middle";
                                 ctx.fillText(grid[i][j], x + cellSize/2, y + cellSize/2);
+                            }
+                        } else {
+                            ctx.fillStyle = flagged[i][j] ? "rgba(255, 0, 85, 0.3)" : "rgba(0, 153, 255, 0.2)";
+                            ctx.fillRect(x, y, cellSize, cellSize);
+                            ctx.strokeStyle = flagged[i][j] ? "#ff0055" : "#0099ff";
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(x, y, cellSize, cellSize);
+                            
+                            if(flagged[i][j]) {
+                                ctx.fillStyle = "#ff0055";
+                                ctx.font = "18px Arial";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText('🚩', x + cellSize/2, y + cellSize/2);
                             }
                         }
                     }
                 }
 
-                updateAndRenderParticles();
+                postRenderFrame();
             }
+
+            preRenderFrame();
+            postRenderFrame();
         }
 
         // ==========================================
-        // 6. BRICK BREAKER MATRIX ENGINE WITH POWERUPS
+        // 6. BRICK BREAKER ENGINE
         // ==========================================
         function setupBrickBreaker() {
-            let paddle, ball, bricks, powerups, score, isRunning;
+            let paddle, ball, bricks, score, isRunning;
             const paddleW = 80, paddleH = 12;
-            const ballSize = 5;
-            const brickRows = 3, brickCols = 8;
-            const brickW = 100 / brickCols;
-            const brickH = 20;
-            const powerupSize = 15;
+            const ballSize = 6;
+            const canvasW = 800, canvasH = 450;
+            const brickW = 60, brickH = 15;
+            const brickCols = 12, brickRows = 4;
 
-            const powerupTypes = {
-                slow: { color: '#0099ff', char: '▼' },
-                expand: { color: '#00ff00', char: '●' },
-                multiball: { color: '#ff00ff', char: '◆' }
-            };
+            function initBricks() {
+                bricks = [];
+                const colors = ['#00ffcc', '#0099ff', '#ffff00', '#ff00ff'];
+                for(let r = 0; r < brickRows; r++) {
+                    for(let c = 0; c < brickCols; c++) {
+                        bricks.push({
+                            x: c * (brickW + 4) + 10,
+                            y: r * (brickH + 4) + 40,
+                            width: brickW,
+                            height: brickH,
+                            color: colors[r],
+                            active: true
+                        });
+                    }
+                }
+            }
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
-                    const canvasEl = document.getElementById('gameCanvas');
-                    canvasEl.style.display = 'block';
-                    document.getElementById('emuContainer').style.display = 'none';
-                    canvas = canvasEl;
+                    const container = document.getElementById('gameCanvasContainer');
+                    container.innerHTML = '';
+                    
+                    canvas = document.createElement('canvas');
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    container.appendChild(canvas);
                     ctx = canvas.getContext('2d');
 
-                    paddle = { x: canvas.width/2 - paddleW/2, y: canvas.height - 40, width: paddleW, height: paddleH, baseWidth: paddleW };
-                    ball = { x: canvas.width/2, y: canvas.height - 60, vx: 4, vy: -4, size: ballSize, speed: 1 };
-                    powerups = [];
+                    paddle = { x: canvasW/2 - paddleW/2, y: canvasH - 30, width: paddleW, height: paddleH, dx: 0 };
+                    ball = { x: canvasW/2, y: canvasH - 50, vx: 4, vy: -4, size: ballSize };
+                    initBricks();
                     score = 0;
                     isRunning = true;
-
-                    bricks = [];
-                    const colors = ['#00ffcc', '#ff0055', '#0099ff', '#ffff00'];
-                    for(let i = 0; i < brickRows; i++) {
-                        for(let j = 0; j < brickCols; j++) {
-                            bricks.push({
-                                x: j * brickW * canvas.width/100, y: i * brickH + 40,
-                                width: brickW * canvas.width/100, height: brickH,
-                                color: colors[i % colors.length], health: 1
-                            });
-                        }
-                    }
-
                     document.getElementById('startBtn').classList.add('hidden');
                     document.getElementById('gameScore').textContent = "00000";
-                    
-                    canvas.onmousemove = function(e) {
+
+                    canvas.onmousemove = (e) => {
                         const rect = canvas.getBoundingClientRect();
-                        paddle.x = (e.clientX - rect.left) - paddle.width/2;
-                        if(paddle.x < 0) paddle.x = 0;
-                        if(paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+                        const scaleX = canvas.width / rect.width;
+                        const x = (e.clientX - rect.left) * scaleX;
+                        paddle.x = Math.max(0, Math.min(x - paddleW/2, canvasW - paddleW));
                     };
 
                     loop();
                 }
             };
-
-            function createPowerup(x, y) {
-                const types = Object.keys(powerupTypes);
-                const type = types[Math.floor(Math.random() * types.length)];
-                powerups.push({
-                    x: x,
-                    y: y,
-                    type: type,
-                    vy: 2
-                });
-            }
-
-            function applyPowerup(type) {
-                switch(type) {
-                    case 'slow':
-                        ball.speed *= 0.7;
-                        setTimeout(() => { ball.speed /= 0.7; }, 5000);
-                        break;
-                    case 'expand':
-                        paddle.width = paddle.baseWidth * 1.5;
-                        setTimeout(() => { paddle.width = paddle.baseWidth; }, 5000);
-                        break;
-                    case 'multiball':
-                        ball = JSON.parse(JSON.stringify(ball));
-                        break;
-                }
-            }
 
             function loop() {
                 if(!isRunning) return;
                 animationId = requestAnimationFrame(loop);
 
-                ball.x += ball.vx * ball.speed;
-                ball.y += ball.vy * ball.speed;
-
-                if(ball.x - ballSize < 0 || ball.x + ballSize > canvas.width) ball.vx *= -1;
-                if(ball.y - ballSize < 0) ball.vy *= -1;
-
-                if(ball.y + ballSize > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
-                    ball.vy = -Math.abs(ball.vy);
-                    ball.y = paddle.y - ballSize;
-                    ball.vx += (ball.x - (paddle.x + paddle.width/2)) * 0.05;
-                    applyScreenShake(4);
-                    createExplosion(ball.x, ball.y, '#00ffcc', 15);
+                // Arrow key controls
+                if(keys['ArrowLeft'] || keys['a']) {
+                    paddle.x = Math.max(0, paddle.x - 7);
+                }
+                if(keys['ArrowRight'] || keys['d']) {
+                    paddle.x = Math.min(canvasW - paddleW, paddle.x + 7);
                 }
 
-                if(ball.y > canvas.height) {
-                    applyScreenShake(20);
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+
+                if(ball.x - ballSize < 0 || ball.x + ballSize > canvasW) ball.vx *= -1;
+                if(ball.y - ballSize < 0) ball.vy *= -1;
+
+                if(ball.y + ballSize > canvasH) {
                     isRunning = false;
+                    applyScreenShake(15);
+                    createExplosion(ball.x, ball.y, '#ff0055', 25);
                     document.getElementById('startBtn').classList.remove('hidden');
-                    document.getElementById('startBtn').textContent = "RETRY GAME";
+                    document.getElementById('startBtn').textContent = "RETRY BREAKOUT";
                     return;
                 }
 
-                powerups.forEach((pu, puIdx) => {
-                    pu.y += pu.vy;
-                    if(pu.y > canvas.height) {
-                        powerups.splice(puIdx, 1);
-                    } else if(pu.x > paddle.x && pu.x < paddle.x + paddle.width && pu.y > paddle.y - powerupSize && pu.y < paddle.y + paddle.height) {
-                        applyPowerup(pu.type);
-                        powerups.splice(puIdx, 1);
-                        createExplosion(pu.x, pu.y, powerupTypes[pu.type].color, 15);
-                    }
-                });
+                if(ball.x > paddle.x && ball.x < paddle.x + paddleW && ball.y + ballSize > paddle.y && ball.y < paddle.y + paddleH) {
+                    ball.vy = -Math.abs(ball.vy);
+                    ball.y = paddle.y - ballSize;
+                    let hitPos = (ball.x - paddle.x) / paddleW;
+                    ball.vx = (hitPos - 0.5) * 8;
+                    applyScreenShake(4);
+                    createExplosion(ball.x, ball.y, '#00ffcc', 12);
+                }
 
-                for(let i = bricks.length - 1; i >= 0; i--) {
-                    let brick = bricks[i];
-                    if(ball.x > brick.x && ball.x < brick.x + brick.width &&
-                       ball.y > brick.y && ball.y < brick.y + brick.height) {
-                        
-                        brick.health--;
-                        if(brick.health <= 0) {
-                            bricks.splice(i, 1);
-                            score += 50;
-                            createExplosion(brick.x + brick.width/2, brick.y + brick.height/2, brick.color, 20);
-                            
-                            if(Math.random() > 0.6) {
-                                createPowerup(brick.x + brick.width/2, brick.y + brick.height/2);
-                            }
-                        }
-                        
-                        let overlapLeft = ball.x + ballSize - brick.x;
-                        let overlapRight = brick.x + brick.width - (ball.x - ballSize);
-                        let overlapTop = ball.y + ballSize - brick.y;
-                        let overlapBottom = brick.y + brick.height - (ball.y - ballSize);
-
-                        if(overlapLeft < overlapRight && overlapLeft < overlapTop && overlapLeft < overlapBottom) {
-                            ball.vx = -Math.abs(ball.vx);
-                        } else if(overlapRight < overlapLeft && overlapRight < overlapTop && overlapRight < overlapBottom) {
-                            ball.vx = Math.abs(ball.vx);
-                        } else {
-                            ball.vy *= -1;
-                        }
-
-                        applyScreenShake(6);
+                for(let brick of bricks) {
+                    if(!brick.active) continue;
+                    if(ball.x > brick.x && ball.x < brick.x + brick.width && ball.y > brick.y && ball.y < brick.y + brick.height) {
+                        brick.active = false;
+                        ball.vy *= -1;
+                        score += 10;
+                        applyScreenShake(3);
+                        createExplosion(brick.x + brick.width/2, brick.y + brick.height/2, brick.color, 15);
                         document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
                         
-                        if(bricks.length === 0) {
+                        if(bricks.every(b => !b.active)) {
                             isRunning = false;
-                            score += 1000;
-                            document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                            applyScreenShake(15);
-                            createExplosion(canvas.width/2, canvas.height/2, '#00ffcc', 50);
                             document.getElementById('startBtn').classList.remove('hidden');
-                            document.getElementById('startBtn').textContent = "NEW LEVEL";
+                            document.getElementById('startBtn').textContent = "NEXT LEVEL";
                         }
-                        break;
                     }
                 }
 
@@ -1495,32 +1465,12 @@
             }
 
             function render() {
-                ctx.fillStyle = "#04010a";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                bricks.forEach(brick => {
-                    ctx.fillStyle = brick.color;
-                    ctx.shadowColor = brick.color;
-                    ctx.shadowBlur = 8;
-                    ctx.fillRect(brick.x + 1, brick.y + 1, brick.width - 2, brick.height - 2);
-                    ctx.strokeStyle = brick.color;
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
-                });
-
-                powerups.forEach(pu => {
-                    ctx.fillStyle = powerupTypes[pu.type].color;
-                    ctx.shadowColor = powerupTypes[pu.type].color;
-                    ctx.shadowBlur = 10;
-                    ctx.beginPath();
-                    ctx.arc(pu.x, pu.y, powerupSize, 0, Math.PI*2);
-                    ctx.fill();
-                });
+                preRenderFrame();
 
                 ctx.fillStyle = "#00ffcc";
                 ctx.shadowColor = "#00ffcc";
                 ctx.shadowBlur = 10;
-                ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+                ctx.fillRect(paddle.x, paddle.y, paddleW, paddleH);
 
                 ctx.fillStyle = "#ffff00";
                 ctx.shadowColor = "#ffff00";
@@ -1529,9 +1479,21 @@
                 ctx.arc(ball.x, ball.y, ballSize, 0, Math.PI*2);
                 ctx.fill();
 
-                updateAndRenderParticles();
+                for(let brick of bricks) {
+                    if(!brick.active) continue;
+                    ctx.fillStyle = brick.color;
+                    ctx.shadowColor = brick.color;
+                    ctx.shadowBlur = 8;
+                    ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                }
+
+                postRenderFrame();
             }
+
+            preRenderFrame();
+            postRenderFrame();
         }
     </script>
-</body>
+</head>
+<body></body>
 </html>

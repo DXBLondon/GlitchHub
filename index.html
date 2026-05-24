@@ -422,6 +422,8 @@
             
             if (canvas) {
                 canvas.onclick = null;
+                canvas.oncontextmenu = null;
+                canvas.onmousemove = null;
                 canvas.style.display = 'none';
             }
             ctx = null;
@@ -494,6 +496,8 @@
 
             if(name !== 'smb') {
                 canvas.onclick = null;
+                canvas.oncontextmenu = null;
+                canvas.onmousemove = null;
             }
 
             modeSelector.classList.add('hidden');
@@ -866,7 +870,6 @@
                 if(!isRunning) return;
                 animationId = requestAnimationFrame(loop);
 
-                // Input handling
                 paddle1.dy = 0;
                 paddle2.dy = 0;
                 
@@ -877,7 +880,6 @@
                     if(keys['ArrowUp']) paddle2.dy = -6;
                     if(keys['ArrowDown']) paddle2.dy = 6;
                 } else {
-                    // AI
                     if(ball.y < paddle2.y + paddleH/2 - 35) paddle2.dy = -5;
                     if(ball.y > paddle2.y + paddleH/2 + 35) paddle2.dy = 5;
                 }
@@ -1441,7 +1443,6 @@
             function render() {
                 preRenderFrame();
 
-                // Draw bricks
                 bricks.forEach(brick => {
                     ctx.fillStyle = brick.color;
                     ctx.shadowColor = brick.color;
@@ -1452,13 +1453,11 @@
                     ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
                 });
 
-                // Draw paddle
                 ctx.fillStyle = "#00ffcc";
                 ctx.shadowColor = "#00ffcc";
                 ctx.shadowBlur = 10;
                 ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 
-                // Draw ball
                 ctx.fillStyle = "#ffff00";
                 ctx.shadowColor = "#ffff00";
                 ctx.shadowBlur = 15;

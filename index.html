@@ -970,10 +970,10 @@
         }
 
         // ==========================================
-        // 4. TETRIS PROTOCOLS ENGINE (TRADITIONAL SIZE)
+        // 4. TETRIS PROTOCOLS ENGINE
         // ==========================================
         function setupTetris() {
-            let grid, currentPiece, nextPiece, score, isRunning, dropCounter, dropSpeed;
+            let grid, currentPiece, score, isRunning, dropCounter, dropSpeed;
             const gridW = 10, gridH = 20, cellSize = 20;
             const canvasW = gridW * cellSize + 40;
             const canvasH = gridH * cellSize + 40;
@@ -1077,11 +1077,11 @@
                     document.getElementById('startBtn').classList.add('hidden');
                     document.getElementById('gameScore').textContent = "00000";
                     
-                    canvas.onkeydown = null;
                     loop();
                 }
             };
 
+            let lastRotateTime = 0;
             function loop() {
                 if(!isRunning) return;
                 animationId = requestAnimationFrame(loop);
@@ -1092,12 +1092,15 @@
                 if((keys['ArrowRight'] || keys['d']) && canPlace(currentPiece, currentPiece.x + 1, currentPiece.y)) {
                     currentPiece.x++;
                 }
-                if(keys[' ']) {
+                
+                // Reduce rotation delay from 200ms to 50ms for responsive controls
+                let currentTime = Date.now();
+                if((keys[' '] || keys['Control']) && currentTime - lastRotateTime > 50) {
                     let rotated = { ...currentPiece, shape: rotatePiece(currentPiece) };
                     if(canPlace(rotated, rotated.x, rotated.y)) {
                         currentPiece.shape = rotated.shape;
                     }
-                    keys[' '] = false;
+                    lastRotateTime = currentTime;
                 }
 
                 let dropAmount = (keys['ArrowDown'] || keys['s']) ? 2 : 1;
@@ -1494,6 +1497,5 @@
             postRenderFrame();
         }
     </script>
-</head>
-<body></body>
+</body>
 </html>

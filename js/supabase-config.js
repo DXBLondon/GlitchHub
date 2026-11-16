@@ -4,6 +4,6 @@
  * The anon key is intended for browser use; NEVER put a service_role key here.
  */
 window.GLITCHHUB_SUPABASE_CONFIG = {
-    url: 'YOUR_SUPABASE_PROJECT_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY'
+    url: 'https://pannevcuspyifasgsxge.supabase.co/rest/v1/',
+    anonKey: 'pannevcuspyifasgsxge'
 };

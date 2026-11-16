@@ -1,341 +1,251 @@
-class User {
-    constructor(username, password) {
-        this.id = (typeof crypto !== 'undefined' && crypto.randomUUID)
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-        this.username = username.trim();
-        this.password = password;
-        this.bio = '';
-        this.avatar = '👤';
-        this.followers = [];
-        this.following = [];
-        this.gamesPlayed = [];
-        this.reviews = [];
-        this.highScores = [];
-        this.createdAt = new Date().toISOString();
-    }
-}
+(function () {
+    const config = window.GLITCHHUB_SUPABASE_CONFIG || {};
+    const clientFactory = window.supabase && window.supabase.createClient;
+    const isConfigured = config.url && config.anonKey &&
+        !config.url.includes('YOUR_') && !config.anonKey.includes('YOUR_');
 
-const GLITCHHUB_USERS_KEY = 'glitchhub_users';
-const GLITCHHUB_CURRENT_USER_KEY = 'glitchhub_current_user';
+    let client = null;
 
-function getAllUsers() {
-    try {
-        return JSON.parse(localStorage.getItem(GLITCHHUB_USERS_KEY)) || [];
-    } catch (error) {
-        console.error('Failed to read users:', error);
-        return [];
-    }
-}
-
-function saveUsers(users) {
-    localStorage.setItem(GLITCHHUB_USERS_KEY, JSON.stringify(users));
-}
-
-function saveCurrentUser(user) {
-    if (!user) {
-        localStorage.removeItem(GLITCHHUB_CURRENT_USER_KEY);
-        return;
+    function getClient() {
+        if (!isConfigured || !clientFactory) {
+            throw new Error('Cloud accounts are not configured yet. Add the Supabase Project URL and anon key in js/supabase-config.js.');
+        }
+        if (!client) client = clientFactory(config.url, config.anonKey);
+        return client;
     }
 
-    localStorage.setItem(GLITCHHUB_CURRENT_USER_KEY, JSON.stringify({
-        id: user.id,
-        username: user.username
-    }));
-}
-
-function getCurrentUser() {
-    try {
-        const currentUser = JSON.parse(localStorage.getItem(GLITCHHUB_CURRENT_USER_KEY) || 'null');
-        if (!currentUser) return null;
-
-        const users = getAllUsers();
-        return users.find(user => user.id === currentUser.id) || null;
-    } catch (error) {
-        console.error('Failed to read current user:', error);
-        return null;
+    function usernameToEmail(username) {
+        // Supabase Auth requires an email or phone identifier. This stable internal
+        // address lets the UI remain username-only; no mail is sent or collected.
+        return `${username.trim().toLowerCase()}@accounts.glitchhub.invalid`;
     }
-}
 
-function updateAuthUI() {
-    const authButton = document.getElementById('authButton');
-    const logoutButton = document.getElementById('logoutButton');
-    const welcomeLabel = document.getElementById('welcomeLabel');
-    const user = getCurrentUser();
+    function usernameIsValid(username) {
+        return /^[a-zA-Z0-9_]{3,24}$/.test(username);
+    }
 
-    if (authButton) {
-        if (user) {
-            authButton.textContent = `Hi, ${user.username}`;
-            authButton.disabled = true;
-            authButton.classList.add('opacity-75', 'cursor-default');
-        } else {
-            authButton.textContent = 'Sign In / Sign Up';
-            authButton.disabled = false;
-            authButton.classList.remove('opacity-75', 'cursor-default');
+    function setMessage(message, isError = false) {
+        const node = document.getElementById('accountMessage');
+        if (!node) return;
+        node.textContent = message;
+        node.classList.toggle('text-rose-400', isError);
+        node.classList.toggle('text-cyan-300', !isError);
+    }
+
+    async function getCurrentUser() {
+        const { data, error } = await getClient().auth.getUser();
+        if (error) throw error;
+        return data.user || null;
+    }
+
+    async function getProfile(user) {
+        if (!user) return null;
+        const { data, error } = await getClient()
+            .from('profiles')
+            .select('id, username, created_at')
+            .eq('id', user.id)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
+    }
+
+    async function loadScores() {
+        const user = await getCurrentUser();
+        const container = document.getElementById('highScoreList');
+        const profile = await getProfile(user);
+        const welcome = document.getElementById('welcomeLabel');
+        const authActions = document.getElementById('authActions');
+        const signOutButton = document.getElementById('signOutButton');
+
+        if (welcome) welcome.textContent = profile ? `Signed in as ${profile.username}` : 'Sign in or create an account';
+        if (authActions) authActions.classList.toggle('hidden', Boolean(user));
+        if (signOutButton) signOutButton.classList.toggle('hidden', !user);
+        if (!container) return;
+
+        if (!user) {
+            container.innerHTML = '<p class="text-gray-400">Sign in to see your scores saved across devices.</p>';
+            return;
+        }
+
+        const { data: scores, error } = await getClient()
+            .from('high_scores')
+            .select('game_name, score, updated_at')
+            .eq('user_id', user.id)
+            .order('score', { ascending: false });
+        if (error) throw error;
+
+        if (!scores || scores.length === 0) {
+            container.innerHTML = '<p class="text-gray-400">No scores saved yet. Your best score for each game will show here.</p>';
+            return;
+        }
+
+        container.replaceChildren(...scores.map((entry, index) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between rounded-lg border border-cyan-500/20 bg-slate-900/60 p-3';
+            const info = document.createElement('div');
+            const title = document.createElement('p');
+            title.className = 'text-xs uppercase tracking-wider text-cyan-300';
+            title.textContent = `#${index + 1} ${entry.game_name}`;
+            const date = document.createElement('p');
+            date.className = 'text-xs text-gray-400';
+            date.textContent = new Date(entry.updated_at).toLocaleDateString();
+            const score = document.createElement('span');
+            score.className = 'font-black text-xl text-green-400';
+            score.textContent = Number(entry.score).toLocaleString();
+            info.append(title, date);
+            row.append(info, score);
+            return row;
+        }));
+    }
+
+    async function signUp(username, password) {
+        username = username.trim();
+        if (!usernameIsValid(username)) {
+            throw new Error('Use 3–24 letters, numbers, or underscores for your username.');
+        }
+        if (password.length < 8) {
+            throw new Error('Choose a password with at least 8 characters.');
+        }
+
+        const auth = getClient().auth;
+        const { data, error } = await auth.signUp({
+            email: usernameToEmail(username),
+            password,
+            options: { data: { username } }
+        });
+        if (error) throw error;
+
+        // With email confirmation disabled, signUp returns an active session.
+        // Upsert profile so the form can also recover from a retried request.
+        if (data.user) {
+            const { error: profileError } = await getClient()
+                .from('profiles')
+                .upsert({ id: data.user.id, username }, { onConflict: 'id' });
+            if (profileError) throw profileError;
+        }
+        await loadScores();
+        setMessage('Account created. You can now sign in on this or another device.');
+    }
+
+    async function signIn(username, password) {
+        username = username.trim();
+        if (!username || !password) throw new Error('Enter your username and password.');
+        const { error } = await getClient().auth.signInWithPassword({
+            email: usernameToEmail(username),
+            password
+        });
+        if (error) throw new Error('Could not sign in with that username and password.');
+        await loadScores();
+        setMessage('Signed in. Your scores are synced to your account.');
+    }
+
+    async function signOut() {
+        const { error } = await getClient().auth.signOut();
+        if (error) throw error;
+        await loadScores();
+        setMessage('Signed out.');
+    }
+
+    async function saveHighScore(gameName, score) {
+        const user = await getCurrentUser();
+        if (!user) return false;
+        const numericScore = Number(score);
+        if (!Number.isFinite(numericScore) || numericScore < 0) return false;
+
+        const { data: previous, error: readError } = await getClient()
+            .from('high_scores')
+            .select('score')
+            .eq('user_id', user.id)
+            .eq('game_name', String(gameName))
+            .maybeSingle();
+        if (readError) throw readError;
+        if (previous && Number(previous.score) >= numericScore) return false;
+
+        const { error } = await getClient()
+            .from('high_scores')
+            .upsert({
+                user_id: user.id,
+                game_name: String(gameName),
+                score: numericScore,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id,game_name' });
+        if (error) throw error;
+        await loadScores();
+        return true;
+    }
+
+    function readForm(formId) {
+        const form = document.getElementById(formId);
+        const formData = new FormData(form);
+        return {
+            username: String(formData.get('username') || ''),
+            password: String(formData.get('password') || '')
+        };
+    }
+
+    function wireForms() {
+        const signInForm = document.getElementById('signinForm');
+        const signUpForm = document.getElementById('signupForm');
+        const signOutButton = document.getElementById('signOutButton');
+        const signInTab = document.getElementById('showSignIn');
+        const signUpTab = document.getElementById('showSignUp');
+
+        if (signInForm) signInForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            try {
+                await signIn(readForm('signinForm').username, readForm('signinForm').password);
+                signInForm.reset();
+            } catch (error) {
+                setMessage(error.message || 'Sign in failed.', true);
+            }
+        });
+
+        if (signUpForm) signUpForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            try {
+                const values = readForm('signupForm');
+                await signUp(values.username, values.password);
+                signUpForm.reset();
+            } catch (error) {
+                setMessage(error.message || 'Could not create account.', true);
+            }
+        });
+
+        if (signOutButton) signOutButton.addEventListener('click', async () => {
+            try { await signOut(); } catch (error) { setMessage(error.message, true); }
+        });
+
+        if (signInTab && signUpTab) {
+            signInTab.addEventListener('click', () => {
+                document.getElementById('signinForm').classList.remove('hidden');
+                document.getElementById('signupForm').classList.add('hidden');
+                setMessage('Sign in with your username and password.');
+            });
+            signUpTab.addEventListener('click', () => {
+                document.getElementById('signupForm').classList.remove('hidden');
+                document.getElementById('signinForm').classList.add('hidden');
+                setMessage('Create a username and password. No email address needed.');
+            });
         }
     }
 
-    if (logoutButton) {
-        logoutButton.classList.toggle('hidden', !user);
-    }
-
-    if (welcomeLabel) {
-        welcomeLabel.textContent = user ? `Logged in as ${user.username}` : 'No account yet';
-    }
-}
-
-function openAuthModal(mode = 'signin') {
-    const modal = document.getElementById('authModal');
-    const signInTab = document.querySelector('[data-auth-tab="signin"]');
-    const signUpTab = document.querySelector('[data-auth-tab="signup"]');
-    const signInForm = document.getElementById('signinForm');
-    const signUpForm = document.getElementById('signupForm');
-
-    if (!modal) return;
-
-    modal.classList.remove('hidden');
-
-    if (signInTab && signUpTab) {
-        const isSignUp = mode === 'signup';
-        signInTab.classList.toggle('bg-cyan-500', !isSignUp);
-        signInTab.classList.toggle('text-black', !isSignUp);
-        signInTab.classList.toggle('bg-slate-800', isSignUp);
-        signInTab.classList.toggle('text-cyan-300', isSignUp);
-
-        signUpTab.classList.toggle('bg-cyan-500', isSignUp);
-        signUpTab.classList.toggle('text-black', isSignUp);
-        signUpTab.classList.toggle('bg-slate-800', !isSignUp);
-        signUpTab.classList.toggle('text-cyan-300', !isSignUp);
-    }
-
-    if (signInForm && signUpForm) {
-        signInForm.classList.toggle('hidden', mode !== 'signin');
-        signUpForm.classList.toggle('hidden', mode !== 'signup');
-    }
-}
-
-function closeAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) modal.classList.add('hidden');
-}
-
-function clearAuthForms() {
-    const fields = [
-        'signupUsername',
-        'signupPassword',
-        'signinUsername',
-        'signinPassword'
-    ];
-
-    fields.forEach(id => {
-        const field = document.getElementById(id);
-        if (field) field.value = '';
-    });
-}
-
-function registerUser() {
-    const username = document.getElementById('signupUsername')?.value.trim();
-    const password = document.getElementById('signupPassword')?.value;
-
-    if (!username || !password) {
-        alert('Please enter a username and password.');
-        return;
-    }
-
-    if (username.length < 3) {
-        alert('Username must be at least 3 characters long.');
-        return;
-    }
-
-    if (password.length < 4) {
-        alert('Password must be at least 4 characters long.');
-        return;
-    }
-
-    const users = getAllUsers();
-    if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
-        alert('That username is already taken.');
-        return;
-    }
-
-    const newUser = new User(username, password);
-    users.push(newUser);
-    saveUsers(users);
-    saveCurrentUser(newUser);
-    clearAuthForms();
-    closeAuthModal();
-    updateAuthUI();
-    alert('Account created successfully!');
-}
-
-function loginUser() {
-    const username = document.getElementById('signinUsername')?.value.trim();
-    const password = document.getElementById('signinPassword')?.value;
-
-    if (!username || !password) {
-        alert('Please enter your username and password.');
-        return;
-    }
-
-    const users = getAllUsers();
-    const user = users.find(item =>
-        item.username.toLowerCase() === username.toLowerCase() &&
-        item.password === password
-    );
-
-    if (!user) {
-        alert('Invalid username or password.');
-        return;
-    }
-
-    saveCurrentUser(user);
-    clearAuthForms();
-    closeAuthModal();
-    updateAuthUI();
-    alert(`Welcome back, ${user.username}!`);
-}
-
-function logoutUser() {
-    saveCurrentUser(null);
-    updateAuthUI();
-    alert('Logged out successfully.');
-}
-
-function saveHighScore(gameName, score) {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return;
-
-    const users = getAllUsers();
-    const userIndex = users.findIndex(user => user.id === currentUser.id);
-    if (userIndex === -1) return;
-
-    users[userIndex].highScores = users[userIndex].highScores || [];
-    users[userIndex].highScores.push({
-        gameName: String(gameName),
-        score: Number(score),
-        createdAt: new Date().toISOString()
+    document.addEventListener('DOMContentLoaded', async () => {
+        wireForms();
+        if (!isConfigured || !clientFactory) {
+            setMessage('Cloud sign-in setup required: configure js/supabase-config.js and run supabase/schema.sql.', true);
+            return;
+        }
+        try {
+            getClient().auth.onAuthStateChange(() => {
+                // Defer Supabase calls to avoid invoking them inside the auth callback.
+                window.setTimeout(() => loadScores().catch(error => setMessage(error.message, true)), 0);
+            });
+            await loadScores();
+            setMessage('Your account and best scores sync across devices.');
+        } catch (error) {
+            setMessage(error.message || 'Could not connect to account service.', true);
+        }
     });
 
-    users[userIndex].highScores.sort((a, b) => Number(b.score) - Number(a.score));
-    users[userIndex].highScores = users[userIndex].highScores.slice(0, 20);
-
-    saveUsers(users);
-    saveCurrentUser(users[userIndex]);
-}
-
-function getHighScoresForCurrentUser() {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return [];
-
-    const users = getAllUsers();
-    const match = users.find(user => user.id === currentUser.id);
-    return match && match.highScores ? match.highScores : [];
-}
-
-function getLeaderboard() {
-    return getAllUsers()
-        .map(user => ({
-            username: user.username,
-            bestScore: user.highScores && user.highScores.length
-                ? Math.max(...user.highScores.map(entry => Number(entry.score)))
-                : 0,
-            games: user.highScores ? user.highScores.length : 0
-        }))
-        .sort((a, b) => b.bestScore - a.bestScore)
-        .slice(0, 10);
-}
-
-function renderHighScoreList() {
-    const list = document.getElementById('highScoreList');
-    if (!list) return;
-
-    const user = getCurrentUser();
-    const scores = getHighScoresForCurrentUser();
-
-    if (!user || scores.length === 0) {
-        list.innerHTML = '<p class="text-gray-400">No scores saved yet. Play a game and your top scores will appear here.</p>';
-        return;
-    }
-
-    list.innerHTML = scores
-        .slice(0, 8)
-        .map((entry, index) => `
-            <div class="flex items-center justify-between rounded-lg border border-cyan-500/20 bg-slate-900/60 p-3">
-                <div>
-                    <p class="text-xs uppercase tracking-wider text-cyan-300">#${index + 1} ${entry.gameName}</p>
-                    <p class="text-xs text-gray-400">${new Date(entry.createdAt).toLocaleDateString()}</p>
-                </div>
-                <span class="font-black text-xl text-green-400">${Number(entry.score).toLocaleString()}</span>
-            </div>
-        `)
-        .join('');
-}
-
-window.GlitchHubAuth = {
-    getAllUsers,
-    getCurrentUser,
-    getLeaderboard,
-    getHighScoresForCurrentUser,
-    saveHighScore,
-    registerUser,
-    loginUser,
-    logoutUser,
-    openAuthModal,
-    closeAuthModal,
-    updateAuthUI,
-    renderHighScoreList
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    const authButton = document.getElementById('authButton');
-    const logoutButton = document.getElementById('logoutButton');
-    const closeButton = document.getElementById('closeAuthModal');
-    const signInTab = document.querySelector('[data-auth-tab="signin"]');
-    const signUpTab = document.querySelector('[data-auth-tab="signup"]');
-    const signUpForm = document.getElementById('signupForm');
-    const signInForm = document.getElementById('signinForm');
-
-    if (authButton) {
-        authButton.addEventListener('click', () => openAuthModal('signin'));
-    }
-
-    if (logoutButton) {
-        logoutButton.addEventListener('click', logoutUser);
-    }
-
-    if (closeButton) {
-        closeButton.addEventListener('click', closeAuthModal);
-    }
-
-    if (signUpTab) {
-        signUpTab.addEventListener('click', () => openAuthModal('signup'));
-    }
-
-    if (signInTab) {
-        signInTab.addEventListener('click', () => openAuthModal('signin'));
-    }
-
-    if (signUpForm) {
-        signUpForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            registerUser();
-        });
-    }
-
-    if (signInForm) {
-        signInForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            loginUser();
-        });
-    }
-
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.addEventListener('click', (event) => {
-            if (event.target === modal) closeAuthModal();
-        });
-    }
-
-    updateAuthUI();
-    renderHighScoreList();
-});
+    window.GlitchHubAuth = { signUp, signIn, signOut, getCurrentUser, saveHighScore, loadScores };
+})();

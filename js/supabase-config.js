@@ -5,5 +5,5 @@
  */
 window.GLITCHHUB_SUPABASE_CONFIG = {
     url: 'https://pannevcuspyifasgsxge.supabase.co/rest/v1/',
-    anonKey: 'pannevcuspyifasgsxge'
+    anonKey: 'sb_publishable_9AGCsXfwUSoKWBNpvNJ7gA_Zz3N03cr'
 };

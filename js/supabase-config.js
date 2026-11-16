@@ -1,9 +1,9 @@
 /*
  * Supabase browser configuration.
- * Create a Supabase project, then set the Project URL and anon/public key here.
- * The anon key is intended for browser use; NEVER put a service_role key here.
+ * Use the Project URL from Project Settings > API (NOT the /rest/v1 URL)
+ * and the anon/public key.
  */
 window.GLITCHHUB_SUPABASE_CONFIG = {
-    url: 'https://pannevcuspyifasgsxge.supabase.co/rest/v1/',
+    url: 'https://pannevcuspyifasgsxge.supabase.co',
     anonKey: 'sb_publishable_9AGCsXfwUSoKWBNpvNJ7gA_Zz3N03cr'
 };

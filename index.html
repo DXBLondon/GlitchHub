@@ -206,8 +206,11 @@
             <div class="text-2xl font-black font-display tracking-wider glitch cursor-pointer" onclick="goHome()">
                 <i class="fas fa-terminal text-xl mr-2"></i>GLITCH<span class="text-pink-500">HUB</span>
             </div>
-            <div class="flex gap-6 items-center">
+            <div class="flex gap-4 items-center">
                 <a href="#" onclick="goHome()" class="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition">Mainframe</a>
+                <a href="accounts.html" class="bg-cyan-500 text-black px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-cyan-400 transition">
+                    Account
+                </a>
             </div>
         </div>
     </nav>
@@ -225,9 +228,14 @@
             <p class="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
                 Zero installations. Pure HTML5 interactive game matrices engineered with optimized game loop updates, enhanced graphics, and precise tracking mechanics.
             </p>
-            <button class="cta-button px-10 py-4 rounded-xl text-lg font-display uppercase font-black tracking-widest text-black" onclick="enterGames()">
-                <i class="fas fa-play mr-2"></i> Access Games
-            </button>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button class="cta-button px-10 py-4 rounded-xl text-lg font-display uppercase font-black tracking-widest text-black" onclick="enterGames()">
+                    <i class="fas fa-play mr-2"></i> Access Games
+                </button>
+                <a href="accounts.html" class="bg-slate-900/80 border border-cyan-500/30 px-10 py-4 rounded-xl text-lg font-display uppercase font-black tracking-widest text-cyan-300 hover:border-cyan-400 hover:text-cyan-200 transition">
+                    <i class="fas fa-user mr-2"></i> Sign In
+                </a>
+            </div>
         </div>
     </section>
 
@@ -300,7 +308,7 @@
                     <div>
                         <div class="text-4xl mb-4 game-icon"><i class="fas fa-bricks"></i></div>
                         <h3 class="text-2xl font-black font-display mb-2 text-orange-400">BRICK BREAKER MATRIX</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed">Paddle control systems with elastic ball physics and destructible block cascades. Multi-hit block degradation and power-ups.</p>
+                        <p class="text-gray-400 text-sm leading-relaxed">Paddle control systems with elastic ball physics and destructible block cascades. Multi-hit block degradation and power-up combos.</p>
                     </div>
                     <div class="mt-6 font-display text-xs tracking-wider text-orange-400 uppercase group-hover:underline">Boot Sequence &rarr;</div>
                 </div>
@@ -669,6 +677,9 @@
                 createExplosion(snake[0].x, snake[0].y, '#ff0055', 40);
                 document.getElementById('startBtn').classList.remove('hidden');
                 document.getElementById('startBtn').textContent = "REBOOT MATRIX MODULE";
+                if (window.GlitchHubAuth && window.GlitchHubAuth.saveHighScore) {
+                    window.GlitchHubAuth.saveHighScore('snake', score);
+                }
             }
 
             function render() {
@@ -794,6 +805,9 @@
                 applyScreenShake(15);
                 document.getElementById('startBtn').classList.remove('hidden');
                 document.getElementById('startBtn').textContent = "RESET MATRIX MATCH";
+                if (window.GlitchHubAuth && window.GlitchHubAuth.saveHighScore) {
+                    window.GlitchHubAuth.saveHighScore('memory', score);
+                }
             }
 
             function loop() {
@@ -937,6 +951,9 @@
                     score1++;
                     document.getElementById('gameScore').textContent = String(score1).padStart(5, '0');
                     ball = { x: canvasW/2, y: canvasH/2, vx: -5, vy: 5, size: ballSize };
+                    if (window.GlitchHubAuth && window.GlitchHubAuth.saveHighScore) {
+                        window.GlitchHubAuth.saveHighScore('pong', score1);
+                    }
                 }
 
                 render();
@@ -978,13 +995,13 @@
             const canvasW = gridW * cellSize + 40;
             const canvasH = gridH * cellSize + 40;
             const tetriminos = [
-                [[1,1,1,1]], // I
-                [[1,1],[1,1]], // O
-                [[0,1,0],[1,1,1]], // T
-                [[1,0,0],[1,1,1]], // L
-                [[0,0,1],[1,1,1]], // J
-                [[0,1,1],[1,1,0]], // S
-                [[1,1,0],[0,1,1]] // Z
+                [[1,1,1,1]],
+                [[1,1],[1,1]],
+                [[0,1,0],[1,1,1]],
+                [[1,0,0],[1,1,1]],
+                [[0,0,1],[1,1,1]],
+                [[0,1,1],[1,1,0]],
+                [[1,1,0],[0,1,1]]
             ];
             const colors = ['#00ffcc', '#ff0055', '#0099ff', '#ffff00', '#ff00ff', '#00ff00', '#ff8800'];
 
@@ -998,61 +1015,63 @@
                 }
             }
 
-            function getNewPiece() {
-                let idx = Math.floor(Math.random() * tetriminos.length);
-                return {
-                    shape: tetriminos[idx],
-                    color: colors[idx],
+            function createPiece() {
+                const type = Math.floor(Math.random() * tetriminos.length);
+                currentPiece = {
+                    matrix: tetriminos[type].map(row => [...row]),
                     x: Math.floor(gridW / 2) - 1,
-                    y: 0
+                    y: 0,
+                    color: colors[type]
                 };
             }
 
-            function canPlace(piece, x, y) {
-                for(let i = 0; i < piece.shape.length; i++) {
-                    for(let j = 0; j < piece.shape[i].length; j++) {
-                        if(piece.shape[i][j]) {
-                            let nx = x + j, ny = y + i;
-                            if(nx < 0 || nx >= gridW || ny >= gridH) return false;
-                            if(ny >= 0 && grid[ny][nx]) return false;
+            function collide(matrix, offsetX, offsetY) {
+                for (let y = 0; y < matrix.length; y++) {
+                    for (let x = 0; x < matrix[y].length; x++) {
+                        if (!matrix[y][x]) continue;
+                        const newX = x + offsetX;
+                        const newY = y + offsetY;
+                        if (newX < 0 || newX >= gridW || newY >= gridH) return true;
+                        if (newY >= 0 && grid[newY][newX]) return true;
+                    }
+                }
+                return false;
+            }
+
+            function merge() {
+                currentPiece.matrix.forEach((row, y) => {
+                    row.forEach((value, x) => {
+                        if (value) {
+                            const yy = y + currentPiece.y;
+                            const xx = x + currentPiece.x;
+                            if (yy >= 0) grid[yy][xx] = currentPiece.color;
                         }
-                    }
-                }
-                return true;
+                    });
+                });
             }
 
-            function rotatePiece(piece) {
-                const len = piece.shape.length;
-                const rotated = [];
-                for(let i = 0; i < len; i++) {
-                    rotated[i] = [];
-                    for(let j = 0; j < piece.shape[i].length; j++) {
-                        rotated[i][j] = piece.shape[len - 1 - j][i];
-                    }
-                }
-                return rotated;
-            }
-
-            function lockPiece(piece) {
-                for(let i = 0; i < piece.shape.length; i++) {
-                    for(let j = 0; j < piece.shape[i].length; j++) {
-                        if(piece.shape[i][j] && piece.y + i >= 0) {
-                            grid[piece.y + i][piece.x + j] = piece.color;
-                        }
-                    }
-                }
-                checkLines();
-            }
-
-            function checkLines() {
-                for(let i = gridH - 1; i >= 0; i--) {
-                    if(grid[i].every(cell => cell !== 0)) {
-                        grid.splice(i, 1);
+            function clearLines() {
+                let linesCleared = 0;
+                for (let y = gridH - 1; y >= 0; y--) {
+                    if (grid[y].every(cell => cell)) {
+                        grid.splice(y, 1);
                         grid.unshift(Array(gridW).fill(0));
-                        score += 100;
-                        applyScreenShake(5);
-                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        linesCleared++;
+                        y++;
                     }
+                }
+                if (linesCleared > 0) {
+                    score += linesCleared * 100;
+                    document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                }
+            }
+
+            function gameOver() {
+                isRunning = false;
+                document.getElementById('startBtn').classList.remove('hidden');
+                document.getElementById('startBtn').textContent = "RESTART TETRIS";
+                if (window.GlitchHubAuth && window.GlitchHubAuth.saveHighScore) {
+                    window.GlitchHubAuth.saveHighScore('tetris', score);
                 }
             }
 
@@ -1061,7 +1080,6 @@
                     if (animationId) cancelAnimationFrame(animationId);
                     const container = document.getElementById('gameCanvasContainer');
                     container.innerHTML = '';
-                    
                     canvas = document.createElement('canvas');
                     canvas.width = canvasW;
                     canvas.height = canvasH;
@@ -1069,54 +1087,48 @@
                     ctx = canvas.getContext('2d');
 
                     initGrid();
-                    currentPiece = getNewPiece();
+                    createPiece();
                     score = 0;
                     isRunning = true;
                     dropCounter = 0;
                     dropSpeed = 30;
                     document.getElementById('startBtn').classList.add('hidden');
-                    document.getElementById('gameScore').textContent = "00000";
-                    
+                    document.getElementById('gameScore').textContent = '00000';
                     loop();
                 }
             };
 
-            let lastRotateTime = 0;
             function loop() {
-                if(!isRunning) return;
+                if (!isRunning) return;
                 animationId = requestAnimationFrame(loop);
 
-                if((keys['ArrowLeft'] || keys['a']) && canPlace(currentPiece, currentPiece.x - 1, currentPiece.y)) {
-                    currentPiece.x--;
+                if (keys['ArrowLeft']) {
+                    if (!collide(currentPiece.matrix, currentPiece.x - 1, currentPiece.y)) currentPiece.x--;
                 }
-                if((keys['ArrowRight'] || keys['d']) && canPlace(currentPiece, currentPiece.x + 1, currentPiece.y)) {
-                    currentPiece.x++;
+                if (keys['ArrowRight']) {
+                    if (!collide(currentPiece.matrix, currentPiece.x + 1, currentPiece.y)) currentPiece.x++;
                 }
-                
-                // Reduce rotation delay from 200ms to 50ms for responsive controls
-                let currentTime = Date.now();
-                if((keys[' '] || keys['Control']) && currentTime - lastRotateTime > 50) {
-                    let rotated = { ...currentPiece, shape: rotatePiece(currentPiece) };
-                    if(canPlace(rotated, rotated.x, rotated.y)) {
-                        currentPiece.shape = rotated.shape;
+                if (keys['ArrowDown']) {
+                    dropCounter += 20;
+                }
+                if (keys[' '] || keys['ArrowUp']) {
+                    const rotated = currentPiece.matrix[0].map((_, index) => currentPiece.matrix.map(row => row[index]).reverse());
+                    if (!collide(rotated, currentPiece.x, currentPiece.y)) {
+                        currentPiece.matrix = rotated;
                     }
-                    lastRotateTime = currentTime;
                 }
 
-                let dropAmount = (keys['ArrowDown'] || keys['s']) ? 2 : 1;
-                dropCounter += dropAmount;
-
-                if(dropCounter >= dropSpeed) {
+                dropCounter++;
+                if (dropCounter > dropSpeed) {
                     dropCounter = 0;
-                    if(canPlace(currentPiece, currentPiece.x, currentPiece.y + 1)) {
+                    if (!collide(currentPiece.matrix, currentPiece.x, currentPiece.y + 1)) {
                         currentPiece.y++;
                     } else {
-                        lockPiece(currentPiece);
-                        currentPiece = getNewPiece();
-                        if(!canPlace(currentPiece, currentPiece.x, currentPiece.y)) {
-                            isRunning = false;
-                            document.getElementById('startBtn').classList.remove('hidden');
-                            document.getElementById('startBtn').textContent = "REBOOT TETRIS";
+                        merge();
+                        clearLines();
+                        createPiece();
+                        if (collide(currentPiece.matrix, currentPiece.x, currentPiece.y)) {
+                            gameOver();
                         }
                     }
                 }
@@ -1127,342 +1139,139 @@
             function render() {
                 preRenderFrame();
 
-                const offsetX = 20, offsetY = 20;
-
-                // Draw grid
-                for(let i = 0; i < gridH; i++) {
-                    for(let j = 0; j < gridW; j++) {
-                        if(grid[i][j]) {
-                            ctx.fillStyle = grid[i][j];
-                            ctx.shadowColor = grid[i][j];
-                            ctx.shadowBlur = 8;
-                            ctx.fillRect(offsetX + j * cellSize, offsetY + i * cellSize, cellSize - 1, cellSize - 1);
+                for (let y = 0; y < gridH; y++) {
+                    for (let x = 0; x < gridW; x++) {
+                        if (grid[y][x]) {
+                            ctx.fillStyle = grid[y][x];
+                            ctx.fillRect(x * cellSize + 20, y * cellSize + 20, cellSize - 1, cellSize - 1);
                         }
                     }
                 }
 
-                // Draw current piece
-                if(currentPiece) {
-                    ctx.fillStyle = currentPiece.color;
-                    ctx.shadowColor = currentPiece.color;
-                    ctx.shadowBlur = 12;
-                    for(let i = 0; i < currentPiece.shape.length; i++) {
-                        for(let j = 0; j < currentPiece.shape[i].length; j++) {
-                            if(currentPiece.shape[i][j]) {
-                                let px = offsetX + (currentPiece.x + j) * cellSize;
-                                let py = offsetY + (currentPiece.y + i) * cellSize;
-                                ctx.fillRect(px, py, cellSize - 1, cellSize - 1);
-                            }
+                currentPiece.matrix.forEach((row, y) => {
+                    row.forEach((value, x) => {
+                        if (value) {
+                            ctx.fillStyle = currentPiece.color;
+                            ctx.fillRect((currentPiece.x + x) * cellSize + 20, (currentPiece.y + y) * cellSize + 20, cellSize - 1, cellSize - 1);
                         }
-                    }
-                }
+                    });
+                });
 
                 postRenderFrame();
             }
-
-            preRenderFrame();
-            postRenderFrame();
         }
 
         // ==========================================
         // 5. MINESWEEPER ENGINE
         // ==========================================
         function setupMinesweeper() {
-            let grid, revealed, flagged, score, isRunning, gameOver;
-            const cols = 8, rows = 8, mines = 10;
-            const cellSize = 40;
-            const canvasW = cols * cellSize, canvasH = rows * cellSize;
+            const existing = document.getElementById('minesweeperPro');
+            if (existing) return;
+            const mineGame = document.createElement('iframe');
+            mineGame.id = 'minesweeperPro';
+            mineGame.src = 'minesweeper.html';
+            mineGame.style.width = '100%';
+            mineGame.style.height = '700px';
+            mineGame.style.border = 'none';
+            mineGame.style.borderRadius = '16px';
+            mineGame.style.background = '#000';
+            document.getElementById('gameCanvasContainer').appendChild(mineGame);
+            document.getElementById('startBtn').classList.add('hidden');
 
-            function initGrid() {
-                grid = Array(rows).fill(null).map(() => Array(cols).fill(0));
-                
-                let minesPlaced = 0;
-                while(minesPlaced < mines) {
-                    let r = Math.floor(Math.random() * rows);
-                    let c = Math.floor(Math.random() * cols);
-                    if(grid[r][c] !== 'M') {
-                        grid[r][c] = 'M';
-                        minesPlaced++;
+            const onMessage = (event) => {
+                if (event.data && event.data.type === 'minesweeper-score') {
+                    if (window.GlitchHubAuth && window.GlitchHubAuth.saveHighScore) {
+                        window.GlitchHubAuth.saveHighScore('minesweeper', event.data.score);
                     }
-                }
-
-                for(let i = 0; i < rows; i++) {
-                    for(let j = 0; j < cols; j++) {
-                        if(grid[i][j] !== 'M') {
-                            let count = 0;
-                            for(let di = -1; di <= 1; di++) {
-                                for(let dj = -1; dj <= 1; dj++) {
-                                    let ni = i + di, nj = j + dj;
-                                    if(ni >= 0 && ni < rows && nj >= 0 && nj < cols && grid[ni][nj] === 'M') count++;
-                                }
-                            }
-                            grid[i][j] = count;
-                        }
-                    }
-                }
-
-                revealed = Array(rows).fill(null).map(() => Array(cols).fill(false));
-                flagged = Array(rows).fill(null).map(() => Array(cols).fill(false));
-            }
-
-            function revealCell(r, c) {
-                if(r < 0 || r >= rows || c < 0 || c >= cols || revealed[r][c] || flagged[r][c]) return;
-                
-                revealed[r][c] = true;
-                
-                if(grid[r][c] === 'M') {
-                    gameOver = true;
-                    isRunning = false;
-                    applyScreenShake(20);
-                    createExplosion(c * cellSize + cellSize/2, r * cellSize + cellSize/2, '#ff0055', 30);
-                } else if(grid[r][c] === 0) {
-                    for(let di = -1; di <= 1; di++) {
-                        for(let dj = -1; dj <= 1; dj++) {
-                            revealCell(r + di, c + dj);
-                        }
-                    }
-                }
-            }
-
-            gameInstance = {
-                start: function() {
-                    if (animationId) cancelAnimationFrame(animationId);
-                    const container = document.getElementById('gameCanvasContainer');
-                    container.innerHTML = '';
-                    
-                    canvas = document.createElement('canvas');
-                    canvas.width = canvasW;
-                    canvas.height = canvasH;
-                    container.appendChild(canvas);
-                    ctx = canvas.getContext('2d');
-
-                    initGrid();
-                    score = 0;
-                    isRunning = true;
-                    gameOver = false;
-                    document.getElementById('startBtn').classList.add('hidden');
-                    document.getElementById('gameScore').textContent = "00000";
-                    
-                    canvas.onclick = (e) => {
-                        const rect = canvas.getBoundingClientRect();
-                        const scaleX = canvas.width / rect.width;
-                        const scaleY = canvas.height / rect.height;
-                        const x = (e.clientX - rect.left) * scaleX;
-                        const y = (e.clientY - rect.top) * scaleY;
-                        const c = Math.floor(x / cellSize);
-                        const r = Math.floor(y / cellSize);
-                        
-                        if(r >= 0 && r < rows && c >= 0 && c < cols && isRunning) {
-                            revealCell(r, c);
-                        }
-                    };
-                    
-                    canvas.oncontextmenu = (e) => {
-                        e.preventDefault();
-                        const rect = canvas.getBoundingClientRect();
-                        const scaleX = canvas.width / rect.width;
-                        const scaleY = canvas.height / rect.height;
-                        const x = (e.clientX - rect.left) * scaleX;
-                        const y = (e.clientY - rect.top) * scaleY;
-                        const c = Math.floor(x / cellSize);
-                        const r = Math.floor(y / cellSize);
-                        
-                        if(r >= 0 && r < rows && c >= 0 && c < cols && !revealed[r][c]) {
-                            flagged[r][c] = !flagged[r][c];
-                        }
-                    };
-                    
-                    loop();
                 }
             };
-
-            function loop() {
-                animationId = requestAnimationFrame(loop);
-                render();
-                
-                if(isRunning) {
-                    let allRevealed = true;
-                    for(let i = 0; i < rows; i++) {
-                        for(let j = 0; j < cols; j++) {
-                            if(grid[i][j] !== 'M' && !revealed[i][j]) allRevealed = false;
-                        }
-                    }
-                    if(allRevealed) {
-                        isRunning = false;
-                        score = 1000;
-                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                        applyScreenShake(10);
-                        createExplosion(canvasW/2, canvasH/2, '#00ffcc', 50);
-                        document.getElementById('startBtn').classList.remove('hidden');
-                        document.getElementById('startBtn').textContent = "REPLAY MINESWEEPER";
-                    }
-                }
-            }
-
-            function render() {
-                preRenderFrame();
-
-                for(let i = 0; i < rows; i++) {
-                    for(let j = 0; j < cols; j++) {
-                        const x = j * cellSize;
-                        const y = i * cellSize;
-                        
-                        if(revealed[i][j]) {
-                            ctx.fillStyle = "rgba(0, 255, 204, 0.1)";
-                            ctx.fillRect(x, y, cellSize, cellSize);
-                            
-                            if(grid[i][j] === 'M') {
-                                ctx.fillStyle = "#ff0055";
-                                ctx.shadowColor = "#ff0055";
-                                ctx.shadowBlur = 10;
-                                ctx.font = "24px Arial";
-                                ctx.textAlign = "center";
-                                ctx.textBaseline = "middle";
-                                ctx.fillText('💣', x + cellSize/2, y + cellSize/2);
-                            } else if(grid[i][j] > 0) {
-                                ctx.fillStyle = "#ffff00";
-                                ctx.font = "20px Arial";
-                                ctx.textAlign = "center";
-                                ctx.textBaseline = "middle";
-                                ctx.fillText(grid[i][j], x + cellSize/2, y + cellSize/2);
-                            }
-                        } else {
-                            ctx.fillStyle = flagged[i][j] ? "rgba(255, 0, 85, 0.3)" : "rgba(0, 153, 255, 0.2)";
-                            ctx.fillRect(x, y, cellSize, cellSize);
-                            ctx.strokeStyle = flagged[i][j] ? "#ff0055" : "#0099ff";
-                            ctx.lineWidth = 1;
-                            ctx.strokeRect(x, y, cellSize, cellSize);
-                            
-                            if(flagged[i][j]) {
-                                ctx.fillStyle = "#ff0055";
-                                ctx.font = "18px Arial";
-                                ctx.textAlign = "center";
-                                ctx.textBaseline = "middle";
-                                ctx.fillText('🚩', x + cellSize/2, y + cellSize/2);
-                            }
-                        }
-                    }
-                }
-
-                postRenderFrame();
-            }
-
-            preRenderFrame();
-            postRenderFrame();
+            window.removeEventListener('message', onMessage);
+            window.addEventListener('message', onMessage);
         }
 
         // ==========================================
-        // 6. BRICK BREAKER ENGINE
+        // 6. BREAKOUT ENGINE
         // ==========================================
         function setupBrickBreaker() {
-            let paddle, ball, bricks, score, isRunning;
-            const paddleW = 80, paddleH = 12;
-            const ballSize = 6;
+            let paddle, ball, bricks, score, lives, isRunning;
             const canvasW = 800, canvasH = 450;
-            const brickW = 60, brickH = 15;
-            const brickCols = 12, brickRows = 4;
-
-            function initBricks() {
-                bricks = [];
-                const colors = ['#00ffcc', '#0099ff', '#ffff00', '#ff00ff'];
-                for(let r = 0; r < brickRows; r++) {
-                    for(let c = 0; c < brickCols; c++) {
-                        bricks.push({
-                            x: c * (brickW + 4) + 10,
-                            y: r * (brickH + 4) + 40,
-                            width: brickW,
-                            height: brickH,
-                            color: colors[r],
-                            active: true
-                        });
-                    }
-                }
-            }
+            const brickRows = 5, brickCols = 10;
+            const brickW = 68, brickH = 22, brickGap = 6;
 
             gameInstance = {
                 start: function() {
                     if (animationId) cancelAnimationFrame(animationId);
                     const container = document.getElementById('gameCanvasContainer');
                     container.innerHTML = '';
-                    
                     canvas = document.createElement('canvas');
                     canvas.width = canvasW;
                     canvas.height = canvasH;
                     container.appendChild(canvas);
                     ctx = canvas.getContext('2d');
 
-                    paddle = { x: canvasW/2 - paddleW/2, y: canvasH - 30, width: paddleW, height: paddleH, dx: 0 };
-                    ball = { x: canvasW/2, y: canvasH - 50, vx: 4, vy: -4, size: ballSize };
-                    initBricks();
-                    score = 0;
-                    isRunning = true;
+                    paddle = { x: canvasW/2 - 55, y: canvasH - 30, width: 110, height: 14 };
+                    ball = { x: canvasW/2, y: canvasH/2, vx: 5, vy: -5, size: 8 };
+                    score = 0; lives = 3; isRunning = true;
+                    bricks = [];
+                    for (let row = 0; row < brickRows; row++) {
+                        for (let col = 0; col < brickCols; col++) {
+                            bricks.push({
+                                x: 20 + col * (brickW + brickGap),
+                                y: 30 + row * (brickH + brickGap),
+                                w: brickW,
+                                h: brickH,
+                                alive: true,
+                                color: ['#00ffcc', '#0099ff', '#ff0055', '#ffff00', '#ff00ff'][row % 5]
+                            });
+                        }
+                    }
                     document.getElementById('startBtn').classList.add('hidden');
-                    document.getElementById('gameScore').textContent = "00000";
-
-                    canvas.onmousemove = (e) => {
-                        const rect = canvas.getBoundingClientRect();
-                        const scaleX = canvas.width / rect.width;
-                        const x = (e.clientX - rect.left) * scaleX;
-                        paddle.x = Math.max(0, Math.min(x - paddleW/2, canvasW - paddleW));
-                    };
-
+                    document.getElementById('gameScore').textContent = '00000';
                     loop();
                 }
             };
 
             function loop() {
-                if(!isRunning) return;
+                if (!isRunning) return;
                 animationId = requestAnimationFrame(loop);
 
-                // Arrow key controls
-                if(keys['ArrowLeft'] || keys['a']) {
-                    paddle.x = Math.max(0, paddle.x - 7);
-                }
-                if(keys['ArrowRight'] || keys['d']) {
-                    paddle.x = Math.min(canvasW - paddleW, paddle.x + 7);
-                }
+                if (keys['ArrowLeft'] || keys['a']) paddle.x -= 10;
+                if (keys['ArrowRight'] || keys['d']) paddle.x += 10;
+                if (paddle.x < 0) paddle.x = 0;
+                if (paddle.x + paddle.width > canvasW) paddle.x = canvasW - paddle.width;
 
                 ball.x += ball.vx;
                 ball.y += ball.vy;
-
-                if(ball.x - ballSize < 0 || ball.x + ballSize > canvasW) ball.vx *= -1;
-                if(ball.y - ballSize < 0) ball.vy *= -1;
-
-                if(ball.y + ballSize > canvasH) {
-                    isRunning = false;
-                    applyScreenShake(15);
-                    createExplosion(ball.x, ball.y, '#ff0055', 25);
-                    document.getElementById('startBtn').classList.remove('hidden');
-                    document.getElementById('startBtn').textContent = "RETRY BREAKOUT";
-                    return;
-                }
-
-                if(ball.x > paddle.x && ball.x < paddle.x + paddleW && ball.y + ballSize > paddle.y && ball.y < paddle.y + paddleH) {
-                    ball.vy = -Math.abs(ball.vy);
-                    ball.y = paddle.y - ballSize;
-                    let hitPos = (ball.x - paddle.x) / paddleW;
-                    ball.vx = (hitPos - 0.5) * 8;
-                    applyScreenShake(4);
-                    createExplosion(ball.x, ball.y, '#00ffcc', 12);
-                }
-
-                for(let brick of bricks) {
-                    if(!brick.active) continue;
-                    if(ball.x > brick.x && ball.x < brick.x + brick.width && ball.y > brick.y && ball.y < brick.y + brick.height) {
-                        brick.active = false;
-                        ball.vy *= -1;
-                        score += 10;
-                        applyScreenShake(3);
-                        createExplosion(brick.x + brick.width/2, brick.y + brick.height/2, brick.color, 15);
-                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
-                        
-                        if(bricks.every(b => !b.active)) {
-                            isRunning = false;
-                            document.getElementById('startBtn').classList.remove('hidden');
-                            document.getElementById('startBtn').textContent = "NEXT LEVEL";
+                if (ball.x <= 0 || ball.x >= canvasW) ball.vx *= -1;
+                if (ball.y <= 0) ball.vy *= -1;
+                if (ball.y + ball.size >= canvasH) {
+                    lives--;
+                    if (lives <= 0) {
+                        isRunning = false;
+                        document.getElementById('startBtn').classList.remove('hidden');
+                        document.getElementById('startBtn').textContent = 'RESTART BREAKOUT';
+                        if (window.GlitchHubAuth && window.GlitchHubAuth.saveHighScore) {
+                            window.GlitchHubAuth.saveHighScore('breakout', score);
                         }
+                        return;
                     }
+                    ball = { x: canvasW/2, y: canvasH/2, vx: 5, vy: -5, size: 8 };
                 }
+
+                if (ball.y + ball.size >= paddle.y && ball.y <= paddle.y + paddle.height && ball.x >= paddle.x && ball.x <= paddle.x + paddle.width) {
+                    ball.vy = -Math.abs(ball.vy);
+                    ball.vx += (ball.x - (paddle.x + paddle.width / 2)) * 0.08;
+                }
+
+                bricks.forEach(brick => {
+                    if (!brick.alive) return;
+                    if (ball.x > brick.x && ball.x < brick.x + brick.w && ball.y > brick.y && ball.y < brick.y + brick.h) {
+                        brick.alive = false;
+                        score += 10;
+                        document.getElementById('gameScore').textContent = String(score).padStart(5, '0');
+                        ball.vy *= -1;
+                    }
+                });
 
                 render();
             }
@@ -1470,31 +1279,26 @@
             function render() {
                 preRenderFrame();
 
-                ctx.fillStyle = "#00ffcc";
-                ctx.shadowColor = "#00ffcc";
-                ctx.shadowBlur = 10;
-                ctx.fillRect(paddle.x, paddle.y, paddleW, paddleH);
+                ctx.fillStyle = '#00ffcc';
+                ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 
-                ctx.fillStyle = "#ffff00";
-                ctx.shadowColor = "#ffff00";
-                ctx.shadowBlur = 15;
+                ctx.fillStyle = '#ffff00';
                 ctx.beginPath();
-                ctx.arc(ball.x, ball.y, ballSize, 0, Math.PI*2);
+                ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2);
                 ctx.fill();
 
-                for(let brick of bricks) {
-                    if(!brick.active) continue;
+                bricks.forEach(brick => {
+                    if (!brick.alive) return;
                     ctx.fillStyle = brick.color;
-                    ctx.shadowColor = brick.color;
-                    ctx.shadowBlur = 8;
-                    ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
-                }
+                    ctx.fillRect(brick.x, brick.y, brick.w, brick.h);
+                });
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Orbitron';
+                ctx.fillText(`LIVES: ${lives}`, 20, canvasH - 20);
 
                 postRenderFrame();
             }
-
-            preRenderFrame();
-            postRenderFrame();
         }
     </script>
 </body>
